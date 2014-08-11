@@ -1,14 +1,14 @@
-= Spring MVC 4.0の基本
+= 最初の一歩
 
 //lead{
 Spring MVCはうんたらかんたら
 //}
 
-== ひな形
+== 基本の形
 
 こんにちは
 
-=== 最低限のひな形
+=== web.xmlに記述する
 
 Springに必要なライブラリーは依存関係が複雑で大変なのでMavenで導入するのが簡単です。依存関係の部分のみ記載します。
 
@@ -117,4 +117,5 @@ http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 </beans>
 //}
 
+=== Javaで設定する
 
