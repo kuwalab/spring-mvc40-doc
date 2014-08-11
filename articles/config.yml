@@ -5,7 +5,7 @@
 # このファイルはUTF-8エンコーディングで記述してください。
 
 # ブック名(ファイル名になるもの。ASCII範囲の文字を使用)
-bookname: book
+bookname: SpringMVC4.0
 # 書名
 booktitle: Spring MVC 4.0
 # 著者

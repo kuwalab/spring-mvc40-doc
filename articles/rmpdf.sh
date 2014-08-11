@@ -1,3 +1,3 @@
-rm -rf book-pdf
-rm book.pdf
+rm -rf SpringMvc4.0-pdf
+rm SpringMVC4.0.pdf
 
