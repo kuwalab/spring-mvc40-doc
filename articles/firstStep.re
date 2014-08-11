@@ -4,7 +4,7 @@
 Spring MVCはうんたらかんたら
 //}
 
-== 基本事項
+== ひな形
 
 こんにちは
 
@@ -91,8 +91,30 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 </web-app>
 //}
 
+長いですが、おおよそ定型句です。
 
-//list[abc02][web.xml]{
+まずfilterですが、requestとresponseの文字コードの指定を毎回しなくていいようにCharacterEncodingFilterを設定します。使用する文字コードに合わせて設定してください。今どきはutf-8一択だと思います。
+
+あとは、Springのリクエストを受け付けるためのDispatherServletの設定になります。DispatherSerlvetの設定で大事なのは、servlet-mappingとパラメータのcontextConfigLocationになります。servlet-mappingはここでは/としています。特定のURLにしたい場合には、/hogeや/fooとしてください。contextConfigLocationはSpring用の設定ファイルの場所を示します。複数ある場合には「,」区切りで指定します。
+
+続いて、web.xmlの中で指定したcontextConfigLocationのファイルの中身を確認します。このファイルがSpringの設定の本体になります。
+
+//list[abc03][WEB-INF/spring/spring-context.xml]{
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+ <mvc:annotation-driven />
+ <context:component-scan base-package="com.example.spring" />
+ <bean
+  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+  <property name="prefix" value="/WEB-INF/jsp/" />
+  <property name="suffix" value=".jsp" />
+ </bean>
+</beans>
 //}
 
 
