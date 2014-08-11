@@ -12,7 +12,7 @@ Spring MVCはうんたらかんたら
 
 Springに必要なライブラリーは依存関係が複雑で大変なのでMavenで導入するのが簡単です。依存関係の部分のみ記載します。
 
-//list[abc][pom.xmlのサンプル]{
+//list[pom.xml][pom.xmlのdependencies部分]{
 <dependencies>
  <!-- Spring Framework -->
  <dependency>
@@ -45,7 +45,7 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 
 続いて、Deployment descriptorになります。Springに必要な設定をweb.xmlに記載します。
 
-//list[abc02][web.xml]{
+//list[web.xml][web.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
@@ -99,7 +99,7 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 
 続いて、web.xmlの中で指定したcontextConfigLocationのファイルの中身を確認します。このファイルがSpringの設定の本体になります。
 
-//list[abc03][WEB-INF/spring/spring-context.xml]{
+//list[spring-context.xml][WEB-INF/spring/spring-context.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
@@ -116,6 +116,63 @@ http://www.springframework.org/schema/context/spring-context-4.0.xsd">
  </bean>
 </beans>
 //}
+
+<mvc-annotation-driven />でSpring MVCの設定が自動的に行われます。
+
+component-scanで、Springのコンポーネントを検索するパッケージを指定します。このパッケージ以下のクラスの@Componentや@Controllerが付いたクラスが自動的にコンポーネントとして登録されます。
+
+もう一つの設定はViewの設定で、デフォルトとしてJSPは/WEB-INF/jsp/ディレクトリ以下に.jspという拡張子として処理します。Viewのresolverについてはどこかできっと解説します。
+
+web.xmlで指定されていたcommon.jspの設定です。JSTLやSpringのタグライブラリーを指定しておきます。必要に応じて設定してください。
+
+//list[common.jsp][WEB-INF/jsp/common/common.jsp]{
+<%@page language="java"  pageEncoding="utf-8" %><%--
+--%><%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%--
+--%><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%--
+--%><%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %><%--
+--%><%@taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+//}
+
+実際に表示に使用するJSPです。
+
+//list[index.jsp][WEB-INF/jsp/hello/index.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+Hello world<br>
+こんにちは世界
+ </body>
+</html>
+//}
+
+最後にコントローラクラスです。何もせずJSPにフォワードしています。
+
+//list[HelloController.java][HelloController.java]{
+package com.example.spring.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+public class HelloController {
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String index() {
+        return "hello/index";
+    }
+}
+//}
+
+Controllerクラスには必ず@Controllerアノテーションを付けます。実際にリクエストを受け付けるメソッドには@RequestMappingアノテーションを付けます。この例では/へのGETメソッドのリクエストを受けつけ、/WEB-INF/jsp/hello/index.jspのJSPへフォワードします。
+
+サーバーを起動して、/にアクセスするとHello worldが表示されると思います。
+
+ソースは@<href>{https://github.com/kuwalab/spring-mvc40}にあります。タグ001が今回のサンプルです。
 
 === Javaで設定する
 
