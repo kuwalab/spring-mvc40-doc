@@ -18,5 +18,6 @@ Servlet / JSPについて知っている人を対象とした、Spring MVCにつ
 == 謝辞
 
 @<href>{https://github.com/kmuto/review}
+
 @<href>{https://github.com/takahashim/review-sample-book}
 
