@@ -119,3 +119,5 @@ http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
 === Javaで設定する
 
+書く
+#@warn(書く)
