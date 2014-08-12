@@ -1,4 +1,5 @@
 = リクエスト 
+
 == リクエストの色々な受け取り方
 
 ==={request_get} GETパラメータを受け取る
@@ -440,7 +441,96 @@ customer.ageの値は <c:out value="${customer.age}" /><br>
 
 == ファイルのアップロード
 
-=== Servlet 3.0によるファイルのアップロード
+==={request_upload} Servlet 3.0によるファイルのアップロード
+
+@<b>{タグ【025】}
+
+Java EE 6、Servlet 3.0から標準でファイルのアップロードができるようになりました。ここではSpringで標準のファイルアップロードを行います。
+
+ファイルアップロードする場合には、web.xmlにアップロードの設定が必要です（もしくはServletのアノテーション）。web.xmlのDispatcherServletの設定を以下のようにします。
+
+//list[request_upload-web.xml][web.xml]{
+<servlet>
+ <servlet-name>dispatcher</servlet-name>
+ <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+ <init-param>
+  <param-name>contextConfigLocation</param-name>
+  <param-value>/WEB-INF/spring/spring-context.xml</param-value>
+ </init-param>
+ <load-on-startup>1</load-on-startup>
+ <multipart-config>
+  <location>/tmp</location>
+  <max-file-size>1000000</max-file-size>
+  <max-request-size>1000000</max-request-size>
+  <file-size-threshold>10000</file-size-threshold>
+ </multipart-config>
+</servlet>
+//}
+
+また、Springの設定も必要になります。
+
+//list[request_upload-spring-context.xml][spring-context.xml]{
+<bean id="multipartResolver"
+ class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
+</bean>
+//}
+
+Controllerは以下のようにします。受け取る際には、@RequestPartアノテーションを付けた引数で受け取ります。
+
+//list[request_upload-ReqController.java][ReqController.java]{
+@RequestMapping("uploadForm")
+public String uploadForm() {
+    return "req/uploadForm";
+}
+
+@RequestMapping(value = "/uploadRecv", method = RequestMethod.POST)
+public String uploadRecv(@RequestParam String test,
+        @RequestParam MultipartFile file, Model model) {
+    model.addAttribute("test", test);
+    model.addAttribute("fileName", file.getOriginalFilename());
+    return "req/uploadRecv";
+}
+//}
+
+今回はファイルは保管せず、testパラメータとファイル名をmodelに格納します。
+
+ファイルを送信するuploadForm.jspです。
+
+//list[request_upload-uploadForm.jsp][uploadForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="uploadRecv" method="post" enctype="multipart/form-data">
+   <input type="text" name="test"><br>
+   <input type="file" name="file"><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+結果表示のuploadRecv.jspです。日本語ファイル名も問題なく表示できます。
+
+//list[request_upload-uploadRecv.jsp][uploadRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+アップロードされました。<br>
+ファイル名は<c:out value="${fileName}" /><br>
+送信されたtestパラメータは<c:out value="${test}" />
+ </body>
+</html>
+//}
 
 === ファイルのアップロードの例外処理
 
