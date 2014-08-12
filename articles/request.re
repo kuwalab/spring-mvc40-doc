@@ -579,6 +579,8 @@ public class GlobalExceptionResolver implements HandlerExceptionResolver {
 
 ==={request_request_scope1} リクエストスコープにデータを格納
 
+@<b>{タグ【027】}
+
 リクエストスコープにデータを格納する方法を紹介します。Springではいくつかの方法でリクエストスコープにデータを格納できます。ひとつは通常のサーブレットと同様にHttpServletRequestを使う方法。2つ目がWebRequestを使う方法。3つ目がModelを使う方法になります。
 
 //list[request_request_scope1-ScopeController.java][ScopeController.java]{
@@ -616,7 +618,56 @@ Model: <c:out value="${requestScope.req3}" />
 
 === Beanをリクエストスコープに格納する
 
-=== セッションスコープにデータを格納
+==={scope_session1} セッションスコープにデータを格納
+
+@<b>{タグ【029】}
+
+セッションにデータを格納する方法もリクエスト同様に複数あります。Servlet APIのHttpSessionを使用する方法、WebRequestを使用する方法などです。
+
+WebRequestはリクエストスコープと同様にデータを格納する際にスコープを指定します。
+
+今回は同一の画面に遷移する3つのメソッドを用意しています。最初のものはセッションにデータを格納するもの、2番目は何もしないもの、3番目はセッションをクリアするものになります。
+
+//list[scope_session1-ScopeController.java][ScopeController.java]{
+@RequestMapping("/sessionScope1")
+public String sessionScope1(HttpSession session, WebRequest webRequest) {
+    session.setAttribute("session1", "httpSession");
+    webRequest.setAttribute("session2", "webRequest",
+            WebRequest.SCOPE_SESSION);
+
+    return "scope/sessionScope1";
+}
+
+@RequestMapping("/sessionScope2")
+public String sessionScope2() {
+    return "scope/sessionScope1";
+}
+
+@RequestMapping("/sessionScope3")
+public String sessionScope3(HttpSession session) {
+    session.invalidate();
+    return "scope/sessionScope1";
+}
+//}
+
+表示用のsessionScop1.jspです。
+
+//list[scope_session1-sessionScope1.jsp][sessionScope1.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+HttpSession: <c:out value="${sessionScope.session1}" /><br>
+WebRequest: <c:out value="${sessionScope.session2}" /><br>
+<a href="sessionScope2">セッションをクリアせず再表示</a><br>
+<a href="sessionScope3">セッションをクリアして再表示</a>
+ </body>
+</html>
+//}
 
 === Beanをセッションスコープに格納する
 
