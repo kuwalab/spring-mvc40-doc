@@ -252,7 +252,63 @@ fooの値は <c:out value="${foo}" /><br>
 </html>
 //}
 
-=== Reader/inputStreamで受け取る
+==={request_reader} Reader/inputStreamで受け取る
+
+@<b>{タグ【008】}
+
+RequestBodyのデータをReaderやInputStreamで受け取ることができます。今回はより簡単なReaderで受け取っています。読み取った1行目のデータをレスポンスに返しています。
+
+//list[request_reader-ReqController.java][ReqController.java]{
+@RequestMapping("/readerForm")
+public String readerForm() {
+    return "req/readerForm";
+}
+
+@RequestMapping(value = "/readerRecv", method = RequestMethod.POST)
+public String readerRecv(BufferedReader reader, Model model)
+        throws IOException {
+    model.addAttribute("body", reader.readLine());
+    return "req/readerRecv";
+}
+//}
+
+POSTデータ送信用のJSP、readerForm.jspです。
+
+//list[request_reader-readerForm.jsp][readerForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="readerRecv" method="post">
+   名前: <input type="text" name="name" size="20"><br>
+   年齢: <input type="text" name="age" size="20"><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+リクエストボディ表示用のreaderRecv.jspです。
+
+//list[request_reader-readerRecv.jsp][readerRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+nameの値は <c:out value="${name}" /><br>
+ageの値は <c:out value="${age}" /><br>
+bodyの値は <c:out value="${body}" /><br>
+ </body>
+</html>
+//}
 
 === HttpEntityで受け取る
 
