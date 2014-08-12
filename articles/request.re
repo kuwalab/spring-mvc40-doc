@@ -149,7 +149,66 @@ bar1の値は <c:out value="${bar1}" />
 </html>
 //}
 
-=== リクエストボディをそのまま受け取る
+==={request_body} リクエストボディをそのまま受け取る
+
+@<b>{タグ【006】}
+
+POSTリクエストのデータは、GETリクエストと同様に@<code>{@RequestParam}で受け取ることもできますが、リクエストボディの生データをそのまま受け取ることもできます。
+
+//list[request_body-ReqController.java][ReqController.java]{
+@RequestMapping("/bodyForm")
+public String bodyForm() {
+    return "req/bodyForm";
+}
+
+@RequestMapping(value = "/bodyRecv", method = RequestMethod.POST)
+public String bodyRecv(@RequestBody String body, Model model) {
+    model.addAttribute("body", body);
+    return "req/bodyRecv";
+}
+//}
+
+リクエストボディは、@<code>{@RequestBody}アノテーションを付けた引数で受け取ります。今回の場合だとリクエストボディがそのままStringのbodyに入ります。
+
+RequestBodyも必須かどうかはrequired属性で指定できます。
+
+POSTデータ送信用のJSP、bodyForm.jspです。
+
+//list[request_body-bodyForm.jsp][bodyForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="bodyRecv" method="post">
+   名前: <input type="text" name="name" size="20"><br>
+   年齢: <input type="text" name="age" size="20"><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+リクエストボディ表示用のbodyRecv.jspです。
+
+//list[request_body-bodyRecv.jsp][bodyRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+nameの値は <c:out value="${name}" /><br>
+ageの値は <c:out value="${age}" /><br>
+bodyの値は <c:out value="${body}" /><br>
+ </body>
+</html>
+//}
 
 === HttpServletRequestとそれに近いもので受け取る
 
