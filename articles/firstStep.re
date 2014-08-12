@@ -10,7 +10,7 @@ Spring MVCはうんたらかんたら
 
 ==={web_xml} web.xmlに記述する
 
-Springに必要なライブラリーは依存関係が複雑で大変なのでMavenで導入するのが簡単です。依存関係の部分のみ記載します。
+Springに必要なライブラリーは依存関係が複雑で大変なためMavenで導入するのが簡単です。pom.xmlの依存関係の部分のみ記載します。
 
 //list[web_xml-pom.xml][pom.xmlのdependencies部分]{
 <dependencies>
@@ -41,7 +41,7 @@ Springに必要なライブラリーは依存関係が複雑で大変なのでMa
 </dependencies>
 //}
 
-Springのライブラリーは、spring-webmvcを指定することで必要な物がひと通り揃います。後は、コンパイル用のServlet／JSPのAPIと汎用のJSTLタグライブラリーを入れておけばいいかと思います。
+Springのライブラリーは、spring-webmvcを指定することで必要な物がひと通り揃います。後は、コンパイル用のServlet／JSPのAPIとJSTLタグライブラリーを入れておけばいいかと思います。
 
 続いて、Deployment descriptorになります。Springに必要な設定をweb.xmlに記載します。
 
@@ -96,7 +96,7 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 
 長いですが、おおよそ定型句です。
 
-まずfilterですが、requestとresponseの文字コードの指定を毎回しなくていいようにCharacterEncodingFilterを設定します。使用する文字コードに合わせて設定してください。今どきはutf-8一択だと思います。
+まずfilterですが、requestとresponseの文字コードの指定を毎回しなくていいようにCharacterEncodingFilterを設定します。使用する文字コードに合わせて設定してください。最近はほとんどの場合でutf-8一だと思います。
 
 あとは、Springのリクエストを受け付けるためのDispatherServletの設定になります。DispatherSerlvetの設定で大事なのは、servlet-mappingとパラメータのcontextConfigLocationになります。servlet-mappingはここでは/としています。特定のURLにしたい場合には、/hogeや/fooとしてください。contextConfigLocationはSpring用の設定ファイルの場所を示します。複数ある場合には「,」区切りで指定します。
 
@@ -121,13 +121,13 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 </beans>
 //}
 
-<mvc-annotation-driven />でSpring MVCの設定が自動的に行われます。
+<mvc:annotation-driven />でSpring MVCの設定が自動的に行われます。
 
-component-scanで、Springのコンポーネントを検索するパッケージを指定します。このパッケージ以下のクラスの@Componentや@Controllerが付いたクラスが自動的にコンポーネントとして登録されます。
+component-scanで、Springのコンポーネントを検索するパッケージを指定します。ここで指定したパッケージ以下の@Componentや@Controllerが付いたクラスが自動的にコンポーネントとして登録されます。
 
-もう一つの設定はViewの設定で、デフォルトとしてJSPは/WEB-INF/jsp/ディレクトリ以下に.jspという拡張子として処理します。Viewのresolverについてはどこかできっと解説します。
+もう一つの設定はViewの設定です。この設定はView名を、/WEB-INF/jsp/ビュー名.jspというファイルとして解釈します。
 
-web.xmlで指定されていたcommon.jspの設定です。JSTLやSpringのタグライブラリーを指定しておきます。必要に応じて設定してください。
+次は、web.xmlで指定したcommon.jspの設定です。JSTLやSpringのタグライブラリーを指定しておきます。必要に応じて設定してください。
 
 //list[web_xml-common.jsp][WEB-INF/jsp/common/common.jsp]{
 <%@page language="java"  pageEncoding="utf-8" %><%--
@@ -174,11 +174,11 @@ public class HelloController {
 
 Controllerクラスには必ず@Controllerアノテーションを付けます。実際にリクエストを受け付けるメソッドには@RequestMappingアノテーションを付けます。この例では/へのGETメソッドのリクエストを受けつけ、/WEB-INF/jsp/hello/index.jspのJSPへフォワードします。
 
-サーバーを起動して、/にアクセスするとHello worldが表示されると思います。
+サーバーを起動して、/にアクセスするとHello worldが表示されます。
 
 ソースは@<href>{https://github.com/kuwalab/spring-mvc40}にあります。タグ001が今回のサンプルです。
 
-==={java_config] Javaで設定する
+==={java_config} Javaで設定する
 
 Java EE 6からプログラムからServletやFilterを登録できるようになりました。
 
@@ -210,7 +210,7 @@ web.xmlでは、ServletとFilterの設定を除去しています。
 
 ついで、@<tt>{WebApplicationInitializer}を実装した、MyWebApplicationInitializerを作成します。
 
-//[java_config-MyWebApplicationInitializer][MyWebApplicationInitializer]{
+//list[java_config-MyWebApplicationInitializer][MyWebApplicationInitializer]{
 package com.example.spring;
 
 import javax.servlet.FilterRegistration;
@@ -245,4 +245,5 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
 WebApplicationInitializerは@<href>{http://docs.oracle.com/javaee/6/api/javax/servlet/ServletContainerInitializer.html, ServletContainerInitializer}を実装した、@<href>{https://github.com/spring-projects/spring-framework/blob/master/spring-web/src/main/java/org/springframework/web/SpringServletContainerInitializer.java, SpringServletContainerInitializer}が、呼び出します。
 
 ソースは@<href>{https://github.com/kuwalab/spring-mvc40}にあります。タグ002が今回のサンプルです。
+
 
