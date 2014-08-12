@@ -100,7 +100,54 @@ var1の値は <c:out value="${var1}" />
 </html>
 //}
 
-=== URLの一部をパラメータとして受け取る（複数）
+==={request_url2} URLの一部をパラメータとして受け取る（複数）
+
+@<b>{タグ【004】}
+
+URLをパラメータとする場合、そのパラメータは1つでなくても構いません。複数のパラメータを受け取ることができますし、パラメータとパラメータの間にURLの一部が混ざっていても問題ありません。
+
+具体的なサンプルは以下のとおりです。
+
+//list[request_url2-ReqController.java][ReqController.java]{
+@RequestMapping(value = "/pathVar3/{foo}/{bar}", method = RequestMethod.GET)
+public String pathVar3(@PathVariable String foo, @PathVariable String bar) {
+    return "req/pathVar3";
+}
+
+@RequestMapping(value = "/pathVar4/{bar1}/{foo1}", method = RequestMethod.GET)
+public String pathVar4(@PathVariable("bar1") String bar,
+        @PathVariable("foo1") String foo) {
+    return "req/pathVar3";
+}
+
+@RequestMapping(value = "/pathVar5/{foo}/param/{bar}", method = RequestMethod.GET)
+public String pathVar5(@PathVariable String foo, @PathVariable String bar) {
+    return "req/pathVar3";
+}
+//}
+
+2つ目のurlpara4メソッドではパラメータの順番と受け取るメソッドの引数の順番を変えています。3つ目のurlparam5メソッドでは、fooパラメータとbarパラメータの間にリテラルのパスを含んでいます。
+
+このように、柔軟にパラメータの設定ができます。
+
+最後に表示用のpathVar3.jspは以下になります。
+
+//list[request_url2-pathVar3.jsp][pathVar3.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+fooの値は <c:out value="${foo}" /><br>
+barの値は <c:out value="${bar}" /><br>
+foo1の値は <c:out value="${foo1}" /><br>
+bar1の値は <c:out value="${bar1}" />
+ </body>
+</html>
+//}
 
 === リクエストボディをそのまま受け取る
 
