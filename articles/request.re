@@ -577,7 +577,42 @@ public class GlobalExceptionResolver implements HandlerExceptionResolver {
 
 == いろいろなスコープ
 
-=== リクエストスコープにデータを格納
+==={request_request_scope1} リクエストスコープにデータを格納
+
+リクエストスコープにデータを格納する方法を紹介します。Springではいくつかの方法でリクエストスコープにデータを格納できます。ひとつは通常のサーブレットと同様にHttpServletRequestを使う方法。2つ目がWebRequestを使う方法。3つ目がModelを使う方法になります。
+
+//list[request_request_scope1-ScopeController.java][ScopeController.java]{
+@RequestMapping("/requestScope1")
+public String requestScope1(HttpServletRequest request,
+        WebRequest webRequest, Model model) {
+    request.setAttribute("req1", "httpServletRequest");
+    webRequest.setAttribute("req2", "webRequest", WebRequest.SCOPE_REQUEST);
+    model.addAttribute("req3", "model");
+    return "scope/requestScope1";
+}
+//}
+
+WebRequestを使用する場合には、格納するスコープを3番目の引数に指定します。それ以外はHttpServletRequestと同様です。
+
+Modelオブジェクトを利用する場合は、メソッド名が違うだけでHttpServletRequestと同様です。
+
+使用するJSPでは、明示してrequestScopeから値を取得しています。
+
+//list[request_reuqest_scope1-requestScope1.jsp][requestScope1.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+HttpServletRequest: <c:out value="${requestScope.req1}" /><br>
+WebRequest: <c:out value="${requestScope.req2}" /><br>
+Model: <c:out value="${requestScope.req3}" />
+ </body>
+</html>
+//}
 
 === Beanをリクエストスコープに格納する
 
