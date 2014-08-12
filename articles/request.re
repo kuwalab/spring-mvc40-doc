@@ -577,3 +577,13 @@ public class GlobalExceptionResolver implements HandlerExceptionResolver {
 
 == いろいろなスコープ
 
+=== リクエストスコープにデータを格納
+
+=== Beanをリクエストスコープに格納する
+
+=== セッションスコープにデータを格納
+
+=== Beanをセッションスコープに格納する
+
+=== Flashスコープにデータを格納
+
