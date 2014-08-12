@@ -4,6 +4,8 @@
 
 ==={request_get} GETパラメータを受け取る
 
+@<b>{タグ【005】}
+
 通常のGETパラメータを受け取るには、@<code>{@RequestParam}アノテーションを使用します。
 
 //list[request_get-ReqController.java][ReqController.java]{
@@ -61,9 +63,9 @@ modelBarの値は <c:out value="${modelBar}" />
 </html>
 //}
 
-ソースは@<href>{https://github.com/kuwalab/spring-mvc40}にあります。タグ005が今回のサンプルです。
-
 ==={request_url1} URLの一部をパラメータとして受け取る
+
+@<b>{タグ【003】}
 
 リクエストされるURLの一部、例えば/hoge/fooの場合fooの値をパラメータとして受け取る場合には、@<code>{@PathVariable}アノテーションを使って受け取ることができます。
 
@@ -97,10 +99,6 @@ var1の値は <c:out value="${var1}" />
  </body>
 </html>
 //}
-
-ソースは@<href>{https://github.com/kuwalab/spring-mvc40}にあります。タグ003が今回のサンプルです。
-
-
 
 === URLの一部をパラメータとして受け取る（複数）
 

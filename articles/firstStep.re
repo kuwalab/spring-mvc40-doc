@@ -8,6 +8,8 @@ Spring MVCはうんたらかんたら
 
 ==={web_xml} web.xmlに記述する
 
+@<b>{タグ【001】}
+
 Springに必要なライブラリーは依存関係が複雑で大変なためMavenで導入するのが簡単です。pom.xmlの依存関係の部分のみ記載します。
 
 //list[web_xml-pom.xml][pom.xmlのdependencies部分]{
@@ -174,9 +176,9 @@ Controllerクラスには必ず@Controllerアノテーションを付けます�
 
 サーバーを起動して、/にアクセスするとHello worldが表示されます。
 
-ソースは@<href>{https://github.com/kuwalab/spring-mvc40}にあります。タグ001が今回のサンプルです。
-
 ==={java_config} Javaで設定する
+
+@<b>{タグ【002】}
 
 Java EE 6からプログラムからServletやFilterを登録できるようになりました。
 
@@ -241,7 +243,4 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
 //}
 
 WebApplicationInitializerは@<href>{http://docs.oracle.com/javaee/6/api/javax/servlet/ServletContainerInitializer.html, ServletContainerInitializer}を実装した、@<href>{https://github.com/spring-projects/spring-framework/blob/master/spring-web/src/main/java/org/springframework/web/SpringServletContainerInitializer.java, SpringServletContainerInitializer}が、呼び出します。
-
-ソースは@<href>{https://github.com/kuwalab/spring-mvc40}にあります。タグ002が今回のサンプルです。
-
 
