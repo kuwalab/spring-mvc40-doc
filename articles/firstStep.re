@@ -48,8 +48,10 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 //list[web_xml-web.xml][web.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
- xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+ xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+ xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
+ xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+  http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
  version="3.1">
  <filter>
   <filter-name>CharacterEncodingFilter</filter-name>
@@ -103,11 +105,12 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 //list[web_xml-spring-context.xml][WEB-INF/spring/spring-context.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:context="http://www.springframework.org/schema/context"
  xsi:schemaLocation="http://www.springframework.org/schema/beans
-http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-http://www.springframework.org/schema/context
-http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+  http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+  http://www.springframework.org/schema/context
+  http://www.springframework.org/schema/context/spring-context-4.0.xsd">
  <mvc:annotation-driven />
  <context:component-scan base-package="com.example.spring" />
  <bean
@@ -186,8 +189,10 @@ Java EE 6からプログラムからServletやFilterを登録できるように�
 //list[java_config-web.xml][web.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
- xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+ xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+ xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
+ xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+  http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
  version="3.1">
  <jsp-config>
   <jsp-property-group>
