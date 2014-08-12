@@ -532,7 +532,48 @@ public String uploadRecv(@RequestParam String test,
 </html>
 //}
 
-=== ファイルのアップロードの例外処理
+==={request_upload_exception} ファイルのアップロードの例外処理
+
+ファイルアップロードでどれだけ大きなファイルをアップロードできるわけではなく、ある程度のサイズで制限させないとサーバーのリソースを食いつぶしてしまいます。
+
+前回設定したように、web.xmlでファイルのサイズは制限できます。
+
+//list[request_upload_exception-web.xml][web.xml]{
+<multipart-config>
+ <location>/tmp</location>
+ <max-file-size>1000000</max-file-size>
+ <max-request-size>1000000</max-request-size>
+ <file-size-threshold>10000</file-size-threshold>
+</multipart-config>
+//}
+
+このサイズを超えた時、SpringではMultipartExceptionが発生します。この例外はController側では補足できず、フレームワーク全体の例外処理で、キャッチする必要があります。
+
+//list[request_upload_exception-GlobalExceptionResolver.java][GlobalExceptionResolver.java]{
+package com.example.spring;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.ModelAndView;
+
+public class GlobalExceptionResolver implements HandlerExceptionResolver {
+    @Override
+    public ModelAndView resolveException(HttpServletRequest request,
+            HttpServletResponse response, Object handler, Exception e) {
+        System.out.println(e);
+        ModelAndView mav = new ModelAndView();
+        mav.addObject("errorMessage", "ファイルサイズが大きすぎます。");
+        mav.setViewName("req/uploadForm");
+        return mav;
+    }
+}
+//}
+
+//list[request_upload_exception-spring-context.xml][spring-context.xml]{
+<bean class="com.example.spring.GlobalExceptionResolver"/>
+//}
 
 == いろいろなスコープ
 
