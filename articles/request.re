@@ -210,7 +210,47 @@ bodyの値は <c:out value="${body}" /><br>
 </html>
 //}
 
-=== HttpServletRequestとそれに近いもので受け取る
+==={request_request} HttpServletRequestとそれに近いもので受け取る
+
+@<b>{タグ【007】}
+
+今回はHttpServletRequestとSpringで用意されている、Reqeustのようなクラスです。WebRequestは色々便利に使えますが、今回はHttpServletRequestと同じ動きができるというところだけ確認します。
+
+//list[request_request-ReqController.java][ReqController.java]{
+@RequestMapping("/req")
+public String req(HttpServletRequest request, Model model) {
+    model.addAttribute("foo", request.getParameter("foo"));
+    return "req/req";
+}
+
+@RequestMapping("/req2")
+public String req2(WebRequest request, Model model) {
+    model.addAttribute("foo", request.getParameter("foo"));
+    return "req/req";
+}
+
+@RequestMapping("/req3")
+public String req3(NativeWebRequest request, Model model) {
+    model.addAttribute("foo", request.getParameter("foo"));
+    return "req/req";
+}
+//}
+
+req.jspは以下です。
+
+//list[request_reuqest-req.jsp][req.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+fooの値は <c:out value="${foo}" /><br>
+ </body>
+</html>
+//}
 
 === Reader/inputStreamで受け取る
 
