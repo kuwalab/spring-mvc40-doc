@@ -33,7 +33,7 @@ public String getParam3(@RequestParam(required = false) String foo,
 }
 //}
 
-上記の例だと、/getParam?foo=1&bar=2や、/getParam2?foo1=3&bar1=4といったリクエストを投げます。
+先の例だと、/getParam?foo=1&bar=2や、/getParam2?foo1=3&bar1=4といったリクエストを投げることでコントローラが動作します。
 
 @<code>{@RequestParam}もパラメータの名前とメソッドの引数の名前が同じものが自動で割り当てられます。パラメータの名前が違う場合には、@<code>{@RequestParam}の属性でその名前を指定します。
 
@@ -41,7 +41,7 @@ public String getParam3(@RequestParam(required = false) String foo,
 
 パラメータを必須としない場合には、required属性をfalseにするか、default属性を設定します。default属性を設定するとrequred属性は暗黙的にfalseになります。
 
-@PathVariableと違い、リクエストスコープに自動で割り当てられることはないため、modelを介してJSPにデータを渡しています。
+後述する@<code>{@PathVariable}と違い、リクエストスコープに自動で割り当てられることはないため、modelを介してJSPにデータを渡しています。
 
 表示用のgetParam.jspは以下のようになります。
 
@@ -80,9 +80,9 @@ public String pathVar2(@PathVariable("var1") String var) {
 }
 //}
 
-パラメータは{}で指定し、その中の名称がパラメータ名となります。受け取るパラメータはメソッドの引数で@PathVariableアノテーションを付けて指定します。この時パラメータ名と変数名が同じ場合には何も指定は必要ありません。pathVar2メソッドのようにパラメータ名と変数名が異なる場合には、アノテーションの属性としてパラメータ名が必要になります。
+パラメータはURL中に{}で指定し、その中の名称がパラメータ名となります。受け取るパラメータはメソッドの引数で@<code>{@PathVariable}アノテーションを付けて指定します。この時パラメータ名と変数名が同じ場合には何も指定は必要ありません。pathVar2メソッドのようにパラメータ名と変数名が異なる場合には、アノテーションの属性としてパラメータ名が必要になります。
 
-表示用のJSPは以下のようになります。@PathVariableで指定されたパラメータは、Spring MVCによって自動的にリクエストスコープの同名の属性に割り当てられます。そのため、JSP側ではリクエストスコープから値を持ってくるため、コントローラでは何もしていません。
+表示用のJSPは以下のようになります。@<code>{@PathVariable}で指定されたパラメータは、Spring MVCによって自動的にリクエストスコープの同名の属性に割り当てられます。そのため、JSP側ではリクエストスコープから値を持ってくるため、コントローラでは何もしていません。
 
 //list[request_url1-pathVar.jsp][pathVar.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
@@ -167,7 +167,7 @@ public String bodyRecv(@RequestBody String body, Model model) {
 }
 //}
 
-リクエストボディは、@<code>{@RequestBody}アノテーションを付けた引数で受け取ります。今回の場合だとリクエストボディがそのままStringのbodyに入ります。
+リクエストボディは、@<code>{@RequestBody}アノテーションを付けた引数で受け取ります。今回の場合だとリクエストボディがそのままStringクラスのbodyに入ります。
 
 RequestBodyも必須かどうかはrequired属性で指定できます。
 
@@ -213,7 +213,7 @@ bodyの値は <c:out value="${body}" /><br>
 
 @<b>{タグ【007】}
 
-今回はHttpServletRequestとSpringで用意されている、Reqeustのようなクラスです。WebRequestは色々便利に使えますが、今回はHttpServletRequestと同じ動きができるというところだけ確認します。
+ここではHttpServletRequestとSpringで用意されている、Reqeustのようなクラスでのデータの受け取り方です。WebRequestは色々便利に使えますが、今回はHttpServletRequestと同じ動きができるというところだけ確認します。
 
 //list[request_request-ReqController.java][ReqController.java]{
 @RequestMapping("/req")
