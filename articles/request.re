@@ -310,7 +310,62 @@ bodyの値は <c:out value="${body}" /><br>
 </html>
 //}
 
-=== HttpEntityで受け取る
+==={request_entity} HttpEntityで受け取る
+
+@<b>{タグ【009】}
+
+今回はSpringで用意されているHttpEntityクラスでリクエストを受け付けます。
+
+//list[request_entity-ReqController.java][ReqController.java]{
+@RequestMapping("/entityForm")
+public String entityForm() {
+    return "req/entityForm";
+}
+
+@RequestMapping(value = "/entityRecv", method = RequestMethod.POST)
+public String entityRecv(HttpEntity<String> httpEntity, Model model) {
+    model.addAttribute("body", httpEntity.getBody());
+    return "req/entityRecv";
+}
+//}
+
+POSTデータ送信用のJSP、entityForm.jspです。
+
+//list[request_entity-entityForm.jsp][entityForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="entityRecv" method="post">
+   名前: <input type="text" name="name" size="20"><br>
+   年齢: <input type="text" name="age" size="20"><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+リクエストボディ表示用のentityRecv.jspです。
+
+//list[request_entity-entityRecv.jsp][entityRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+nameの値は <c:out value="${name}" /><br>
+ageの値は <c:out value="${age}" /><br>
+bodyの値は <c:out value="${body}" /><br>
+ </body>
+</html>
+//}
 
 === 任意のクラス（モデル）で受け取る
 
