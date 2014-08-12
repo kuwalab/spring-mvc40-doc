@@ -1,5 +1,4 @@
-= リクエスト
-
+= リクエスト 
 == リクエストの色々な受け取り方
 
 ==={request_get} GETパラメータを受け取る
@@ -367,7 +366,77 @@ bodyの値は <c:out value="${body}" /><br>
 </html>
 //}
 
-=== 任意のクラス（モデル）で受け取る
+==={request_class} 任意のクラス（モデル）で受け取る
+
+@<b>{タグ【010】}
+
+今回は、リクエストパラメータを任意のオブジェクトで受け取ります。
+
+最初にデータを受け取るクラスを作成します。フィールド名は受け取るパラメータ名と同じにしておきます。
+
+//list[request_class-Customer.java][Customer.java]{
+package com.example.spring.controller;
+
+public class Customer {
+    private String name;
+    private String age;
+
+    // setter、getterは省略
+}
+//}
+
+コントローラは、@<code>{@ModelAttribute}アノテーションを付けたクラスに、自動的に同名のフィールドにマッピングされます。また、@<code>{@PathVariable}アノテーションと同様に@<code>{@ModelAttribute}アノテーションを付けたインスタンスは、自動的にリクエストスコープに設定されます。@<code>{@PathVariable}と違うのは、オブジェクトそのものがリクエストスコープに設定される点です。
+
+//list[request_class-ReqController.java][ReqController.java]{
+@RequestMapping("/modelForm")
+public String modelForm() {
+    return "req/modelForm";
+}
+
+@RequestMapping(value = "/modelRecv", method = RequestMethod.POST)
+public String modelRecv(@ModelAttribute Customer customer) {
+    return "req/modelRecv";
+}
+//}
+
+データを送信する、modelForm.jspです。
+
+//list[request_class-modelForm.jsp][modelForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="modelRecv" method="post">
+   名前: <input type="text" name="name" size="20"><br>
+   年齢: <input type="text" name="age" size="20"><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+データを受信する、modelRecv.jspです。
+
+//list[request_class-modelRecv.jsp][modelRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+nameの値は <c:out value="${name}" /><br>
+ageの値は <c:out value="${age}" /><br>
+customer.nameの値は <c:out value="${customer.name}" /><br>
+customer.ageの値は <c:out value="${customer.age}" /><br>
+ </body>
+</html>
+//}
 
 == ファイルのアップロード
 
