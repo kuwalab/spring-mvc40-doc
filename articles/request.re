@@ -4,7 +4,7 @@
 
 ==={request_get} GETパラメータを受け取る
 
-通常のGETパラメータを受け取るには、@<tt>{@RequestParam}アノテーションを使用します。
+通常のGETパラメータを受け取るには、@<code{@RequestParam}アノテーションを使用します。
 
 //list[request_get-ReqController.java][ReqController.java]{
 @RequestMapping(value = "/getParam")
@@ -34,9 +34,9 @@ public String getParam3(@RequestParam(required = false) String foo,
 
 上記の例だと、/getParam?foo=1&bar=2や、/getParam2?foo1=3&bar1=4といったリクエストを投げます。
 
-@<tt>{@RequestParam}もパラメータの名前とメソッドの引数の名前が同じものが自動で割り当てられます。パラメータの名前が違う場合には、@<tt>{@RequestParam}の属性でその名前を指定します。
+@<code{@RequestParam}もパラメータの名前とメソッドの引数の名前が同じものが自動で割り当てられます。パラメータの名前が違う場合には、@<code{@RequestParam}の属性でその名前を指定します。
 
-@<tt>{@RequestParam}で指定したパラメータがない場合、例えば、/getParamというリクエストが送信された場合、必要なパラメータが無いため例外が発生します。
+@<code{@RequestParam}で指定したパラメータがない場合、例えば、/getParamというリクエストが送信された場合、必要なパラメータが無いため例外が発生します。
 
 パラメータを必須としない場合には、required属性をfalseにするか、default属性を設定します。default属性を設定するとrequred属性は暗黙的にfalseになります。
 

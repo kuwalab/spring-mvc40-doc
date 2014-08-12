@@ -208,7 +208,7 @@ Java EE 6からプログラムからServletやFilterを登録できるように�
 
 web.xmlでは、ServletとFilterの設定を除去しています。
 
-ついで、@<tt>{WebApplicationInitializer}を実装した、MyWebApplicationInitializerを作成します。
+ついで、@<code>{WebApplicationInitializer}を実装した、MyWebApplicationInitializerを作成します。
 
 //list[java_config-MyWebApplicationInitializer][MyWebApplicationInitializer]{
 package com.example.spring;
