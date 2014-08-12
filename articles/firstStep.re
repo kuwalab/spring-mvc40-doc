@@ -8,11 +8,11 @@ Spring MVCはうんたらかんたら
 
 こんにちは
 
-=== web.xmlに記述する
+==={web_xml} web.xmlに記述する
 
 Springに必要なライブラリーは依存関係が複雑で大変なのでMavenで導入するのが簡単です。依存関係の部分のみ記載します。
 
-//list[pom.xml][pom.xmlのdependencies部分]{
+//list[web_xml-pom.xml][pom.xmlのdependencies部分]{
 <dependencies>
  <!-- Spring Framework -->
  <dependency>
@@ -45,7 +45,7 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 
 続いて、Deployment descriptorになります。Springに必要な設定をweb.xmlに記載します。
 
-//list[web.xml][web.xml]{
+//list[web_xml-web.xml][web.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
@@ -74,6 +74,7 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
    <param-name>contextConfigLocation</param-name>
    <param-value>/WEB-INF/spring/spring-context.xml</param-value>
   </init-param>
+  <load-on-startup>1</load-on-startup>
  </servlet>
  <servlet-mapping>
   <servlet-name>dispatcher</servlet-name>
@@ -99,7 +100,7 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 
 続いて、web.xmlの中で指定したcontextConfigLocationのファイルの中身を確認します。このファイルがSpringの設定の本体になります。
 
-//list[spring-context.xml][WEB-INF/spring/spring-context.xml]{
+//list[web_xml-spring-context.xml][WEB-INF/spring/spring-context.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
@@ -125,7 +126,7 @@ component-scanで、Springのコンポーネントを検索するパッケージ
 
 web.xmlで指定されていたcommon.jspの設定です。JSTLやSpringのタグライブラリーを指定しておきます。必要に応じて設定してください。
 
-//list[common.jsp][WEB-INF/jsp/common/common.jsp]{
+//list[web_xml-common.jsp][WEB-INF/jsp/common/common.jsp]{
 <%@page language="java"  pageEncoding="utf-8" %><%--
 --%><%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%--
 --%><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%--
@@ -135,7 +136,7 @@ web.xmlで指定されていたcommon.jspの設定です。JSTLやSpringのタ�
 
 実際に表示に使用するJSPです。
 
-//list[index.jsp][WEB-INF/jsp/hello/index.jsp]{
+//list[web_xml-index.jsp][WEB-INF/jsp/hello/index.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -152,7 +153,7 @@ Hello world<br>
 
 最後にコントローラクラスです。何もせずJSPにフォワードしています。
 
-//list[HelloController.java][HelloController.java]{
+//list[web_xml-HelloController.java][HelloController.java]{
 package com.example.spring.controller;
 
 import org.springframework.stereotype.Controller;
@@ -174,7 +175,69 @@ Controllerクラスには必ず@Controllerアノテーションを付けます�
 
 ソースは@<href>{https://github.com/kuwalab/spring-mvc40}にあります。タグ001が今回のサンプルです。
 
-=== Javaで設定する
+==={java_config] Javaで設定する
 
-書く
-#@warn(書く)
+Java EE 6からプログラムからServletやFilterを登録できるようになりました。
+
+そこで、最初のweb.xmlをプログラムに置き換えてみます。
+
+まず、web.xmlの中のJavaコードに置き換えられる部分を削除します。
+
+//list[java_config-web.xml][web.xml]{
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
+ xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+ version="3.1">
+ <jsp-config>
+  <jsp-property-group>
+   <url-pattern>*.jsp</url-pattern>
+   <el-ignored>false</el-ignored>
+   <page-encoding>utf-8</page-encoding>
+   <scripting-invalid>true</scripting-invalid>
+   <include-prelude>/WEB-INF/jsp/common/common.jsp</include-prelude>
+  </jsp-property-group>
+ </jsp-config>
+</web-app>
+//}
+
+web.xmlでは、ServletとFilterの設定を除去しています。
+
+ついで、@<tt>{WebApplicationInitializer}を実装した、MyWebApplicationInitializerを作成します。
+
+//[java_config-MyWebApplicationInitializer][MyWebApplicationInitializer]{
+package com.example.spring;
+
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
+
+import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.filter.CharacterEncodingFilter;
+import org.springframework.web.servlet.DispatcherServlet;
+
+public class MyWebApplicationInitializer implements WebApplicationInitializer {
+
+    @Override
+    public void onStartup(ServletContext context) throws ServletException {
+        ServletRegistration.Dynamic dispacherServlet = context.addServlet(
+                "dispatcher", new DispatcherServlet());
+        dispacherServlet.setLoadOnStartup(1);
+        dispacherServlet.addMapping("/");
+        dispacherServlet.setInitParameter("contextConfigLocation",
+                "/WEB-INF/spring/spring-context.xml");
+
+        FilterRegistration.Dynamic characterEncodingFilter = context.addFilter(
+                "CharacterEncodingFilter", new CharacterEncodingFilter());
+        characterEncodingFilter.setInitParameter("encoding", "utf-8");
+        characterEncodingFilter.setInitParameter("forceEncoding", "true");
+        characterEncodingFilter.addMappingForUrlPatterns(null, true, "/*");
+    }
+}
+//}
+
+WebApplicationInitializerは@<href>{http://docs.oracle.com/javaee/6/api/javax/servlet/ServletContainerInitializer.html, ServletContainerInitializer}を実装した、@<href>{https://github.com/spring-projects/spring-framework/blob/master/spring-web/src/main/java/org/springframework/web/SpringServletContainerInitializer.java, SpringServletContainerInitializer}が、呼び出します。
+
+ソースは@<href>{https://github.com/kuwalab/spring-mvc40}にあります。タグ002が今回のサンプルです。
+
