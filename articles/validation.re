@@ -310,7 +310,33 @@ book.priceの値は <c:out value="${book.price}" /><br>
 
 空文字のチェックのためにはBean Validation標準のアノテーションではなく、HibernateのValiationを使うとできます。この辺りは次回以降に解説していきます。
 
-=== ValidatorでDecimalのチェック
+==={validation_decimal} ValidatorでDecimalのチェック
+
+@<b>{タグ【013】}
+
+今回からしばらくBean Validationの標準のValidatorの説明をしていきます。最初はDecimalMax、DecimalMinの2つです。
+
+DecimalMaxとDecimalMinはその名の通り、数値の最大と最小をチェックします。また、inclusive属性をtrue/falseにすることで、値自体を含む、含まないかを選択できます。
+
+Bookのpriceフィールドに値を設定します。以下の例だと1〜100000未満だけ入力が許されます。
+
+//list[validation_decimal-Book.java][Book.java]{
+@NotNull
+private String name;
+@NotNull
+@DecimalMin("1")
+@DecimalMax(value = "100000", inclusive = false)
+private Integer price;
+//}
+
+DecimalMaxとDecimalMinのメッセージを用意します。
+
+//list[validation_decimal-messages.properties][messages.properties]{
+javax.validation.constraints.DecimalMax.message = {0}は{value}${inclusive == true ? '以下の' : 'より小さい'}数を入力してください
+javax.validation.constraints.DecimalMin.message = {0}は{value}${inclusive == true ? '以上の' : 'より大きい'}数を入力してください
+//}
+
+メッセージでは、{value}でValidationする値をメッセージに埋め込むことができます。また、EL 3.0による処理でinclusiveの値によってメッセージを変えています。ELが使えることによって、かなり柔軟なメッセージ表示が可能になっています。
 
 === ValidatorでMin、Maxのチェック
 
