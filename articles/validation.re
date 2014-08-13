@@ -384,7 +384,29 @@ private Double price;
 javax.validation.constraints.Digits.message = {0}は整数{integer}桁、小数{fraction}桁以内で入力してください
 //}
 
-=== ValidatorでSizeのチェック
+==={validation_size} ValidatorでSizeのチェック
+
+@<b>{タグ【016】}
+
+今回はBean ValidationのSizeです。
+
+Sizeは文字列の長さの検査や、Collectionの長さの検査ができます。今回は文字列の長さの例を見ていきます。
+
+//list[validation_size-Book.java][Book.java]{
+@NotNull
+@Size(min = 10, max = 10)
+private String name;
+@NotNull
+private Integer price;
+//}
+
+メッセージは以下のように記述します。
+
+//list[validation_size-messages.properties][messages.properties]{
+javax.validation.constraints.Size.message = ${min == max ? min += '文字で入力してください' : min += '〜' += max += '文字で入力してください'}
+//}
+
+メッセージはELで分岐し、最大最小文字が同じ場合と、それ以外で変更しています
 
 === Validatorで正規表現でのチェック
 
