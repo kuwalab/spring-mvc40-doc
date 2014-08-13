@@ -2,7 +2,7 @@
 == レスポンスの返し方
 == ファイルのダウンロード
 
-==={csv_dowonload1} CSVダウンロード（Springに依存しない方法）
+==={csv_dowonload1} CSVファイルのダウンロード（Springに依存しない方法）
 
 @<b>{タグ【022】}
 
@@ -57,6 +57,50 @@ public class ResController {
  </head>
  <body>
   <a href="csvDown">csvDown</a>
+ </body>
+</html>
+//}
+
+==={csv_download2} CSVファイルのダウンロード（ResponseEntity）
+
+@<b>{タグ【023】}
+
+今回もCSVダウンロードについてです。今回はResponseEntityクラスを使用したダウンロードについてです。
+
+ResponseEntityではデータと、ヘッダー、ステータスコードを返せます。
+
+日本語の文字化けをしないようにするために、HttpHeadersクラスのsetContentTypeを使わずに、addメソッドで文字コードと一緒にcontent-typeを指定しています。
+
+CSVデータはただの文字列のデータになります。
+
+//list[csv_download2-ResController.java][ResController.java]{
+@RequestMapping(value = "/csvDown2", method = RequestMethod.GET, produces = "application/octet-stream;charset=utf-8")
+public ResponseEntity<String> csvDown2() {
+    HttpHeaders headers = new HttpHeaders();
+    // headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+    headers.add("contet-type", MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
+            + ";utf-8");
+    headers.set("Content-Disposition", "filename=\"test2.csv\"");
+    String csvData = "山田　太郎,33\r\n";
+    csvData = csvData + "田中　花子,29";
+
+    return new ResponseEntity<String>(csvData, headers, HttpStatus.OK);
+}
+//}
+
+アンカーを表示する画面です。単純なアンカーのみです。前回のものに2を追加しています。
+
+//list[csv_download2-csvInit.jsp][csvInit.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <a href="csvDown">csvDown</a><br>
+  <a href="csvDown2">csvDown2</a>
  </body>
 </html>
 //}
