@@ -53,7 +53,9 @@ book.priceの値は <c:out value="${book.price}" /><br>
 このプログラムで「/checkType?name=書籍&price=文字列」というリクエストを投げると以下の様な出力になります。
 
 //cmd{
-バインディングエラー Failed to convert property value of type java.lang.String to required type java.lang.Integer for property price; nested exception is java.lang.NumberFormatException: For input string: "文字列"
+バインディングエラー Failed to convert property value of type java.lang.String to required
+    type java.lang.Integer for property price; nested exception is 
+    java.lang.NumberFormatException: For input string: "文字列"
 book.nameの値は 書籍
 book.priceの値は 
 //}
