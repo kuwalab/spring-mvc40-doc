@@ -669,7 +669,75 @@ WebRequest: <c:out value="${sessionScope.session2}" /><br>
 </html>
 //}
 
-=== Beanをセッションスコープに格納する
+==={scope_session2} Beanをセッションスコープに格納する
+
+BeanをSessionに登録するためには、web.xmlにRequestContextListenerの設定が必要になります。
+
+//list[scope_session2-web.xml][web.xml]{
+<listener>
+ <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+</listener>
+//}
+
+セッションに格納するBeanは以下のように定義します。
+
+//list[scope_session2-SessionBook.java][SessionBook.java]{
+@Component
+@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class SessionBook implements Serializable {
+    private String name;
+    private Integer price;
+    // getter、setterは省略
+}
+//}
+
+ポイントは@Scopeでsessionを指定することと、proxyModeにTARGET_CLASSを指定することです。
+
+特にproxyModeは重要で、これを設定しないと動作しません。
+
+@<href>{http://d.hatena.ne.jp/minokuba/20110209/1297262226}
+
+ついで、Controllerのコードです。セッションに格納されていることがわかるようにセッションに格納後リダイレクトでページを表示します。
+
+//list[scope_session2-ScopeController.java][ScopeController.java]{
+@Autowired
+private SessionBook sessionBook;
+
+@RequestMapping("/sessionStart")
+public String sessionStart() {
+    sessionBook.setName("よくわかるHttpSession");
+    sessionBook.setPrice(980);
+    return "redirect:/sessionScope4";
+}
+
+@RequestMapping("/sessionScope4")
+public String sessionScope4(Model model) {
+    model.addAttribute("modelSessionBook", sessionBook);
+    return "scope/sessionScope4";
+}
+//}
+
+Beanは通常通り@Autowiredすることで自動的にSessionに格納されます。
+
+//list[scope_session2-sessionScope4.jsp][sessionScope4.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+ <c:out value="${requestScope.sessionBook.name}" />
+sessionScope.書名: <c:out value="${sessionScope.sessionBook.name}" /><br>
+sessionScope.価格: <c:out value="${sessionScope.sessionBook.price}" /><br>
+modelSessionBook.書名: <c:out value="${modelSessionBook.name}" /><br>
+modelSessionBook.価格: <c:out value="${modelSessionBook.price}" /><br>
+scopedSession.sessionBook.書名: <c:out value="${model.sessionBook.name}" /><br>
+scopedSession.sessionBook.価格: <c:out value="${model.sessionBook.price}" /><br>
+ </body>
+</html>
+//}
 
 === Flashスコープにデータを格納
 
