@@ -14,30 +14,30 @@ Springに必要なライブラリーは依存関係が複雑で大変なためMa
 
 //list[web_xml-pom.xml][pom.xmlのdependencies部分]{
 <dependencies>
- <!-- Spring Framework -->
- <dependency>
-  <groupId>org.springframework</groupId>
-  <artifactId>spring-webmvc</artifactId>
-  <version>4.0.6.RELEASE</version>
- </dependency>
- <!-- Servlet -->
- <dependency>
-  <groupId>javax.servlet</groupId>
-  <artifactId>javax.servlet-api</artifactId>
-  <version>3.1.0</version>
-  <scope>provided</scope>
- </dependency>
- <dependency>
-  <groupId>javax.servlet.jsp</groupId>
-  <artifactId>javax.servlet.jsp-api</artifactId>
-  <version>2.3.1</version>
-  <scope>provided</scope>
- </dependency>
- <dependency>
-  <groupId>javax.servlet</groupId>
-  <artifactId>jstl</artifactId>
-  <version>1.2</version>
- </dependency>
+<!-- Spring Framework -->
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-webmvc</artifactId>
+<version>4.0.6.RELEASE</version>
+</dependency>
+<!-- Servlet -->
+<dependency>
+<groupId>javax.servlet</groupId>
+<artifactId>javax.servlet-api</artifactId>
+<version>3.1.0</version>
+<scope>provided</scope>
+</dependency>
+<dependency>
+<groupId>javax.servlet.jsp</groupId>
+<artifactId>javax.servlet.jsp-api</artifactId>
+<version>2.3.1</version>
+<scope>provided</scope>
+</dependency>
+<dependency>
+<groupId>javax.servlet</groupId>
+<artifactId>jstl</artifactId>
+<version>1.2</version>
+</dependency>
 </dependencies>
 //}
 
@@ -48,49 +48,49 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 //list[web_xml-web.xml][web.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xmlns="http://xmlns.jcp.org/xml/ns/javaee"
- xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
- xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
-  http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
- version="3.1">
- <filter>
-  <filter-name>CharacterEncodingFilter</filter-name>
-  <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-  <init-param>
-   <param-name>encoding</param-name>
-   <param-value>utf-8</param-value>
-  </init-param>
-  <init-param>
-   <param-name>forceEncoding</param-name>
-   <param-value>true</param-value>
-  </init-param>
- </filter>
- <filter-mapping>
-  <filter-name>CharacterEncodingFilter</filter-name>
-  <url-pattern>/*</url-pattern>
- </filter-mapping>
- <servlet>
-  <servlet-name>dispatcher</servlet-name>
-  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-  <init-param>
-   <param-name>contextConfigLocation</param-name>
-   <param-value>/WEB-INF/spring/spring-context.xml</param-value>
-  </init-param>
-  <load-on-startup>1</load-on-startup>
- </servlet>
- <servlet-mapping>
-  <servlet-name>dispatcher</servlet-name>
-  <url-pattern>/</url-pattern>
- </servlet-mapping>
- <jsp-config>
-  <jsp-property-group>
-   <url-pattern>*.jsp</url-pattern>
-   <el-ignored>false</el-ignored>
-   <page-encoding>utf-8</page-encoding>
-   <scripting-invalid>true</scripting-invalid>
-   <include-prelude>/WEB-INF/jsp/common/common.jsp</include-prelude>
-  </jsp-property-group>
- </jsp-config>
+xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
+xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+version="3.1">
+<filter>
+<filter-name>CharacterEncodingFilter</filter-name>
+<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+<init-param>
+<param-name>encoding</param-name>
+<param-value>utf-8</param-value>
+</init-param>
+<init-param>
+<param-name>forceEncoding</param-name>
+<param-value>true</param-value>
+</init-param>
+</filter>
+<filter-mapping>
+<filter-name>CharacterEncodingFilter</filter-name>
+<url-pattern>/*</url-pattern>
+</filter-mapping>
+<servlet>
+<servlet-name>dispatcher</servlet-name>
+<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+<init-param>
+<param-name>contextConfigLocation</param-name>
+<param-value>/WEB-INF/spring/spring-context.xml</param-value>
+</init-param>
+<load-on-startup>1</load-on-startup>
+</servlet>
+<servlet-mapping>
+<servlet-name>dispatcher</servlet-name>
+<url-pattern>/</url-pattern>
+</servlet-mapping>
+<jsp-config>
+<jsp-property-group>
+<url-pattern>*.jsp</url-pattern>
+<el-ignored>false</el-ignored>
+<page-encoding>utf-8</page-encoding>
+<scripting-invalid>true</scripting-invalid>
+<include-prelude>/WEB-INF/jsp/common/common.jsp</include-prelude>
+</jsp-property-group>
+</jsp-config>
 </web-app>
 //}
 
@@ -105,19 +105,19 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 //list[web_xml-spring-context.xml][WEB-INF/spring/spring-context.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xmlns:context="http://www.springframework.org/schema/context"
- xsi:schemaLocation="http://www.springframework.org/schema/beans
-  http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-  http://www.springframework.org/schema/context
-  http://www.springframework.org/schema/context/spring-context-4.0.xsd">
- <mvc:annotation-driven />
- <context:component-scan base-package="com.example.spring" />
- <bean
-  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-  <property name="prefix" value="/WEB-INF/jsp/" />
-  <property name="suffix" value=".jsp" />
- </bean>
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:context="http://www.springframework.org/schema/context"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+<mvc:annotation-driven />
+<context:component-scan base-package="com.example.spring" />
+<bean
+class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+<property name="prefix" value="/WEB-INF/jsp/" />
+<property name="suffix" value=".jsp" />
+</bean>
 </beans>
 //}
 
@@ -143,14 +143,14 @@ component-scanで、Springのコンポーネントを検索するパッケージ
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
- <head>
-  <meta charset="utf-8">
-  <title>サンプル</title>
- </head>
- <body>
+<head>
+<meta charset="utf-8">
+<title>サンプル</title>
+</head>
+<body>
 Hello world<br>
 こんにちは世界
- </body>
+</body>
 </html>
 //}
 
@@ -165,10 +165,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 public class HelloController {
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String index() {
-        return "hello/index";
-    }
+@RequestMapping(value = "/", method = RequestMethod.GET)
+public String index() {
+return "hello/index";
+}
 }
 //}
 
@@ -189,20 +189,20 @@ Java EE 6からプログラムからServletやFilterを登録できるように�
 //list[java_config-web.xml][web.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xmlns="http://xmlns.jcp.org/xml/ns/javaee"
- xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
- xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
-  http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
- version="3.1">
- <jsp-config>
-  <jsp-property-group>
-   <url-pattern>*.jsp</url-pattern>
-   <el-ignored>false</el-ignored>
-   <page-encoding>utf-8</page-encoding>
-   <scripting-invalid>true</scripting-invalid>
-   <include-prelude>/WEB-INF/jsp/common/common.jsp</include-prelude>
-  </jsp-property-group>
- </jsp-config>
+xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
+xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+version="3.1">
+<jsp-config>
+<jsp-property-group>
+<url-pattern>*.jsp</url-pattern>
+<el-ignored>false</el-ignored>
+<page-encoding>utf-8</page-encoding>
+<scripting-invalid>true</scripting-invalid>
+<include-prelude>/WEB-INF/jsp/common/common.jsp</include-prelude>
+</jsp-property-group>
+</jsp-config>
 </web-app>
 //}
 
@@ -224,23 +224,25 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 public class MyWebApplicationInitializer implements WebApplicationInitializer {
 
-    @Override
-    public void onStartup(ServletContext context) throws ServletException {
-        ServletRegistration.Dynamic dispacherServlet = context.addServlet(
-                "dispatcher", new DispatcherServlet());
-        dispacherServlet.setLoadOnStartup(1);
-        dispacherServlet.addMapping("/");
-        dispacherServlet.setInitParameter("contextConfigLocation",
-                "/WEB-INF/spring/spring-context.xml");
+@Override
+public void onStartup(ServletContext context) throws ServletException {
+ServletRegistration.Dynamic dispacherServlet = context.addServlet(
+	"dispatcher", new DispatcherServlet());
+dispacherServlet.setLoadOnStartup(1);
+dispacherServlet.addMapping("/");
+dispacherServlet.setInitParameter("contextConfigLocation",
+	"/WEB-INF/spring/spring-context.xml");
 
-        FilterRegistration.Dynamic characterEncodingFilter = context.addFilter(
-                "CharacterEncodingFilter", new CharacterEncodingFilter());
-        characterEncodingFilter.setInitParameter("encoding", "utf-8");
-        characterEncodingFilter.setInitParameter("forceEncoding", "true");
-        characterEncodingFilter.addMappingForUrlPatterns(null, true, "/*");
-    }
+FilterRegistration.Dynamic characterEncodingFilter = context.addFilter(
+	"CharacterEncodingFilter", new CharacterEncodingFilter());
+characterEncodingFilter.setInitParameter("encoding", "utf-8");
+characterEncodingFilter.setInitParameter("forceEncoding", "true");
+characterEncodingFilter.addMappingForUrlPatterns(null, true, "/*");
+}
 }
 //}
 
-WebApplicationInitializerは@<href>{http://docs.oracle.com/javaee/6/api/javax/servlet/ServletContainerInitializer.html, ServletContainerInitializer}を実装した、@<href>{https://github.com/spring-projects/spring-framework/blob/master/spring-web/src/main/java/org/springframework/web/SpringServletContainerInitializer.java, SpringServletContainerInitializer}が、呼び出します。
+WebApplicationInitializerは@<href>{http://docs.oracle.com/javaee/6/api/javax/servlet/ServletContainerInitializer.html, ServletContainerInitializer}@<fn>{java_config-WebApplicationInitializer}を実装した、@<href>{https://github.com/spring-projects/spring-framework/blob/master/spring-web/src/main/java/org/springframework/web/SpringServletContainerInitializer.java, SpringServletContainerInitializer}@<fn>{java_config-SpringServletContainerInitializer}が、呼び出します。
+//footnote[java_config-WebApplicationInitializer][http://docs.oracle.com/javaee/6/api/javax/servlet/ServletContainerInitializer.html]
+//footnote[java_config-SpringServletContainerInitializer][https://github.com/spring-projects/spring-framework/blob/master/spring-web/src/main/java@<br>{}/org/springframework/web/SpringServletContainerInitializer.java]
 
