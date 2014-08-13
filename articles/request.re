@@ -34,9 +34,9 @@ public String getParam3(@RequestParam(required = false) String foo,
 }
 //}
 
-先の例だと、/getParam?foo=1&bar=2や、/getParam2?foo1=3&bar1=4といったリクエストを投げることでコントローラが動作します。
+先の例だと、/getParam?foo=1&bar=2や、/getParam2?foo1=3&bar1=4といったリクエストを投げることでコントローラが動作します。getParam3はパラメータが必須ではないため、とくにパラメータがなくても呼び出すことができます。
 
-@<code>{@RequestParam}もパラメータの名前とメソッドの引数の名前が同じものが自動で割り当てられます。パラメータの名前が違う場合には、@<code>{@RequestParam}の属性でその名前を指定します。
+@<code>{@RequestParam}はパラメータの名前とメソッドの引数の名前が同じものが自動で割り当てられます。パラメータの名前が違う場合には、@<code>{@RequestParam}の属性でその名前を指定します。
 
 @<code>{@RequestParam}で指定したパラメータがない場合、例えば、/getParamというリクエストが送信された場合、必要なパラメータが無いため例外が発生します。
 
@@ -475,7 +475,7 @@ Java EE 6、Servlet 3.0から標準でファイルのアップロードができ
 </bean>
 //}
 
-Controllerは以下のようにします。受け取る際には、@RequestPartアノテーションを付けた引数で受け取ります。
+Controllerは以下のようにします。受け取る際には、@<code>{@RequestParam}アノテーションを付けた引数で受け取ります。
 
 //list[request_upload-ReqController.java][ReqController.java]{
 @RequestMapping("uploadForm")
