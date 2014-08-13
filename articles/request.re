@@ -675,7 +675,9 @@ BeanをSessionに登録するためには、web.xmlにRequestContextListenerの�
 
 //list[scope_session2-web.xml][web.xml]{
 <listener>
- <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+ <listener-class>
+  org.springframework.web.context.request.RequestContextListener
+ </listener-class>
 </listener>
 //}
 
@@ -683,7 +685,8 @@ BeanをSessionに登録するためには、web.xmlにRequestContextListenerの�
 
 //list[scope_session2-SessionBook.java][SessionBook.java]{
 @Component
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(value = WebApplicationContext.SCOPE_SESSION,
+     proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class SessionBook implements Serializable {
     private String name;
     private Integer price;
