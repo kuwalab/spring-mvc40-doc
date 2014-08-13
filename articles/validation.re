@@ -362,7 +362,27 @@ javax.validation.constraints.Max.message = {0}は{value}以下の数を入力し
 javax.validation.constraints.Min.message = {0}は{value}以上の数を入力してください
 //}
 
-=== ValidatorでDigitsのチェック
+==={validation_digits} ValidatorでDigitsのチェック
+
+@<b>{タグ【015】}
+
+今回はBean ValidationのDigitsです。
+
+Digitsは数値の具体的な最小、最大値ではなく、整数部の最大桁数、小数部の最大桁数を指定します。桁数以内であれば、小さくても大丈夫です。
+
+//list[validation_digits-Book.java][Book.java]{
+@NotNull
+private String name;
+@NotNull
+@Digits(integer = 3, fraction = 2)
+private Double price;
+//}
+
+メッセージは以下のように記述します。
+
+//list[validation_digits-messages.propeties][messages.properties]{
+javax.validation.constraints.Digits.message = {0}は整数{integer}桁、小数{fraction}桁以内で入力してください
+//}
 
 === ValidatorでSizeのチェック
 
