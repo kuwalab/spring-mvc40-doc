@@ -447,7 +447,40 @@ private Integer price;
 org.hibernate.validator.constraints.NotBlank.message = 入力は必須です
 //}
 
-=== Validatorでロジックを介した検証
+==={validation_logic} Validatorでロジックを介した検証
+
+@<b>{タグ【019】}
+
+今回はBean Validationのの複数のフィールドを対象とした検証です。
+
+Bean Validationはその名前の通り、JavaBeansのテストの仕組みです。そのため、フィールドだけでなくgetterに対してテストをすることができます。（より詳しくは@<href>{http://yamkazu.hatenablog.com/entry/20110206/1296985545, JSR 303 Bean Validationで遊んでみるよ！}）
+
+今回はgetter（isですが）を使ってロジックを介したテストを確認します。今までのBookクラスに定価フィールド（listPrice）を追加し、価格は定価よりも安くないといけないというテストを追加します。
+
+//list[validation_logic-Book.java][Book.java]{
+@NotBlank
+private String name;
+@NotNull
+private Integer price;
+@NotNull
+private Integer listPrice;
+
+@AssertTrue(message = "{valid.price}")
+public boolean isValidPrice() {
+    if (price == null || listPrice == null) {
+        return true;
+    }
+    return listPrice >= price;
+}
+//}
+
+isValidPrice()メソッドで、定価と価格のチェックをしています。いずれも@NotNullをつけているのでnullの場合には検証はOKとしています。
+
+メッセージは置き換え文字列としているためvalid.priceを以下のように定義しています。
+
+//list[validation_logic-messages.properties][messages.properties]{
+valid.price=価格は定価より安い値段にしてください。
+//}
 
 === Validatorのエラーの際に入力値を再表示させる
 
