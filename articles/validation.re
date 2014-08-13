@@ -338,7 +338,29 @@ javax.validation.constraints.DecimalMin.message = {0}は{value}${inclusive == tr
 
 メッセージでは、{value}でValidationする値をメッセージに埋め込むことができます。また、EL 3.0による処理でinclusiveの値によってメッセージを変えています。ELが使えることによって、かなり柔軟なメッセージ表示が可能になっています。
 
-=== ValidatorでMin、Maxのチェック
+==={validation_min_max} ValidatorでMin、Maxのチェック
+
+@<b>{タグ【014】}
+
+今回はBean ValidationのMin、Maxの2つです。
+
+MinとMaxはDecimalMax、DecimalMinと違い、整数のみのチェックとなります。またその数値自身を含むチェックのみが可能です。valueも数値で指定できるので、整数のチェックの場合はこちらのほうがいいかもしれません。
+
+//list[validation_min_max-Book.java][Book.java]{
+@NotNull
+private String name;
+@NotNull
+@Min(1)
+@Max(100000)
+private Integer price;
+//}
+
+メッセージは以下のように記述します。
+
+//list[validation_min_max-messages.properties][messages.properteis]{
+javax.validation.constraints.Max.message = {0}は{value}以下の数を入力してください
+javax.validation.constraints.Min.message = {0}は{value}以上の数を入力してください
+//}
 
 === ValidatorでDigitsのチェック
 
