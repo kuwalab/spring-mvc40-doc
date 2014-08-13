@@ -149,5 +149,93 @@ public String csvDown3(HttpServletResponse response) {
 </html>
 //}
 
-=== Resolverを使う
+==={csv_download4} CSVファイルのダウンロード（Resolver）
+
+@<b>{タグ【032】}
+
+spring-context.xmlにViewResolverの設定を追加します。
+
+//list[csv_download4-spring-context.xml][spring-context.xml]{
+<bean id="xmlViewResolver" class="org.springframework.web.servlet.view.XmlViewResolver">
+ <property name="order" value="1" />
+ <property name="location" value="/WEB-INF/spring/views.xml" />
+</bean>
+//}
+
+views.xmlは以下になります。
+
+//list[csv_download4-views.xml][views.xml]{
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:mvc="http://www.springframework.org/schema/mvc"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+ <bean id="csvDownload" class="com.example.spring.controller.CsvDownloadView" />
+</beans>
+//}
+
+Resolver
+
+//list[csv_download4-CsvDownloadView.java][CsvDownloadView.java]{
+package com.example.spring.controller;
+
+import java.io.PrintWriter;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.servlet.view.AbstractView;
+
+public class CsvDownloadView extends AbstractView {
+
+    @Override
+    protected void renderMergedOutputModel(Map<String, Object> model,
+            HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
+        response.setContentType(MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
+                + ";charset=utf-8");
+        ;
+
+        response.setHeader("Content-Disposition",
+                "attachment; filename=\"test.csv\"");
+        try (PrintWriter pw = response.getWriter()) {
+            for (Book book : (List<Book>) model.get("bookList")) {
+                pw.print(book.getName());
+                pw.print(",");
+                pw.println(book.getPrice());
+            }
+        }
+    }
+}
+//}
+
+Controllerです。
+
+//list[csv_download4-ResController.java][ResController.java]{
+@RequestMapping("/csvDown4")
+public String csvDown4(Model model) {
+    List<Book> bookList = new ArrayList<>();
+
+    Book book = new Book();
+    book.setName("よくわかるSpring");
+    book.setPrice(3000);
+    bookList.add(book);
+
+    book = new Book();
+    book.setName("よくわかるJava");
+    book.setPrice(2980);
+    bookList.add(book);
+
+    model.addAttribute("bookList", bookList);
+    return "csvDownload";
+}
+//}
 
