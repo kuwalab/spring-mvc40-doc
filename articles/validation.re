@@ -118,7 +118,197 @@ price=価格
 
 == JSR349によるvalidation
 
-=== Validatorでnullチェック
+==={validation_not_null} Validatorでnullチェック
+
+@<b>{タグ【012】}
+
+Springは標準でBean Validationをサポートしており、Spring 4.0からはJSR-349のBean Validation 1.1をサポートしています。ここでははSpringでBean Validationを使うための設定と、nullチェックのサンプルを紹介します。
+
+まず、MavenでBean Validation関連のライブラリーを追加します。
+
+//list[validation_not_null-pom.xml][pom.xml]{
+<dependency>
+ <groupId>javax.el</groupId>
+ <artifactId>javax.el-api</artifactId>
+ <version>3.0.0</version>
+ <scope>provided</scope>
+</dependency>
+<dependency>
+ <groupId>javax.validation</groupId>
+ <artifactId>validation-api</artifactId>
+ <version>1.1.0.Final</version>
+</dependency>
+<dependency>
+ <groupId>org.hibernate</groupId>
+ <artifactId>hibernate-validator</artifactId>
+ <version>5.1.1.Final</version>
+</dependency>
+//}
+
+Bean Validation 1.1本体と、参照実装のHibernate 5.1、また、Bean Validation 1.1からは内部でEL 3.0を使用するためELのライブラリーを追加しています。
+
+ついでSpring MVCの設定のWEB-INF/spring/spring-context.xmlを編集します。それなりの量が変わるため全体を再掲しています。
+
+//list[validation_not_null-spring-context.xml][spring-context.xml]{
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:mvc="http://www.springframework.org/schema/mvc"
+ xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+ <mvc:annotation-driven validator="validator" />
+ <context:component-scan base-package="com.example.spring" />
+ <bean
+  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+  <property name="prefix" value="/WEB-INF/jsp/" />
+  <property name="suffix" value=".jsp" />
+ </bean>
+ <bean id="messageSource"
+  class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+  <property name="basename" value="classpath:/messages" />
+ </bean>
+ <bean id="validator"
+  class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+  <property name="validationMessageSource" ref="messageSource" />
+ </bean>
+</beans>
+//}
+
+messageSourceを定義し、そのソースをvalidatorに関連付けます。そのvalidatorを<mvc:annotation-driven>のvalidator属性に設定し、Validatorの設定は完了となります。
+
+メッセージリソースは、Hibernateに付属のプロパティファイルをそのまま利用します。
+
+//list[validation_not_null-messages.properties1][messages.properties]{
+javax.validation.constraints.AssertFalse.message = must be false
+javax.validation.constraints.AssertTrue.message = must be true
+javax.validation.constraints.DecimalMax.message = must be less than ${inclusive == true ? 'or equal to ' : ''}{value}
+javax.validation.constraints.DecimalMin.message = must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}
+javax.validation.constraints.Digits.message = numeric value out of bounds (<{integer} digits>.<{fraction} digits> expected)
+javax.validation.constraints.Future.message = must be in the future
+javax.validation.constraints.Max.message = must be less than or equal to {value}
+javax.validation.constraints.Min.message = must be greater than or equal to {value}
+javax.validation.constraints.NotNull.message = may not be null
+javax.validation.constraints.Null.message = must be null
+javax.validation.constraints.Past.message = must be in the past
+javax.validation.constraints.Pattern.message = must match "{regexp}"
+javax.validation.constraints.Size.message = size must be between {min} and {max}
+
+org.hibernate.validator.constraints.CreditCardNumber.message = invalid credit card number
+org.hibernate.validator.constraints.EAN.message = invalid {type} barcode
+org.hibernate.validator.constraints.Email.message = not a well-formed email address
+org.hibernate.validator.constraints.Length.message = length must be between {min} and {max}
+org.hibernate.validator.constraints.LuhnCheck.message = The check digit for ${value} is invalid, Luhn Modulo 10 checksum failed
+org.hibernate.validator.constraints.Mod10Check.message = The check digit for ${value} is invalid, Modulo 10 checksum failed
+org.hibernate.validator.constraints.Mod11Check.message = The check digit for ${value} is invalid, Modulo 11 checksum failed
+org.hibernate.validator.constraints.ModCheck.message = The check digit for ${value} is invalid, ${modType} checksum failed
+org.hibernate.validator.constraints.NotBlank.message = may not be empty
+org.hibernate.validator.constraints.NotEmpty.message = may not be empty
+org.hibernate.validator.constraints.ParametersScriptAssert.message = script expression "{script}" didn't evaluate to true
+org.hibernate.validator.constraints.Range.message = must be between {min} and {max}
+org.hibernate.validator.constraints.SafeHtml.message = may have unsafe html content
+org.hibernate.validator.constraints.ScriptAssert.message = script expression "{script}" didn't evaluate to true
+org.hibernate.validator.constraints.URL.message = must be a valid URL
+
+org.hibernate.validator.constraints.br.CNPJ.message = invalid Brazilian corporate taxpayer registry number (CNPJ)
+org.hibernate.validator.constraints.br.CPF.message = invalid Brazilian individual taxpayer registry number (CPF)
+org.hibernate.validator.constraints.br.TituloEleitoral.message = invalid Brazilian Voter ID card number
+//}
+
+このままだと英語だけなので、必要な物から日本語にしていきます。日本語のメッセージリソースは、messages_ja.propertiesというファイル名にして以下の内容にしておきます。
+
+//list[validation_not_null-messages.properties2][messages.properties]{
+javax.validation.constraints.NotNull.message = 入力は必須です
+
+typeMismatch.java.lang.Integer={0}は整数で入力してください。
+price=価格
+//}
+
+次にvalidatorを動作させるためのControllerを作成します。
+
+//list[validation_not_null-CheckController.java][CheckController.java]{
+@RequestMapping("/bookForm")
+public String bookForm() {
+    return "check/bookForm";
+}
+
+@RequestMapping(value = "/bookRecv", method = RequestMethod.POST)
+public String bookRecv(@Valid @ModelAttribute Book book,
+        BindingResult errors) {
+    if (errors.hasErrors()) {
+        return "check/bookForm";
+    }
+    return "check/bookRecv";
+}
+//}
+
+コントローラで重要なのは、データを受信するbookRecvメソッドになります。bookRecvメソッドではデータを受け取るBookクラスに@Validアノテーションがついています。@Validアノテーションを付けることでBean Validationが動作するようになります。また、Bean Validationの検証結果は、次の引数のBindingResultの中に格納されます。
+
+メソッドの中で、BindingResult#hasErrorsメソッドでエラーが有るか確認し、エラーがある場合には入力画面に戻るようにしています。
+
+次に、Bookクラスの定義を確認します。
+
+//list[valiidation_not_null-Book.java][Book.java]{
+package com.example.spring.controller;
+
+import javax.validation.constraints.NotNull;
+
+public class Book {
+    @NotNull
+    private String name;
+    @NotNull
+    private Integer price;
+    // setter、getterは省略
+}
+//}
+
+Bookクラスの各フィールドには@NotNullアノテーションを付けています。このアノテーションを付けることで@Validの付いたコントローラで自動的にValidationが行われます。@NotNullアノテーションをつけているとフィールドがnullの場合に検証エラーとなります。
+
+次にJSPを確認していきます。まずデータ送信をするためのフォームの画面（bookForm.jsp）です。
+
+//list[validation_not_null-bookForm.jsp][bookForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="bookRecv" method="post">
+   書名: <input type="text" name="name" size="20"><form:errors path="book.name" /><br>
+   価格: <input type="text" name="price" size="20"><form:errors path="book.price" /><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+入力画面では、入力フォームの後ろにエラー表示のカスタムタグをつけています。pathにはモデルオブジェクト（book）のフィールド名を指定します。こうすることで、そのフィールドで発生したエラーがカスタムタグの場所に表示されます。
+
+入力された結果の確認用のJSP（bookRecv.jsp）です。
+
+//list[validation_not_null-bookRecv.jsp][bookRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+book.nameの値は <c:out value="${book.name}" /><br>
+book.priceの値は <c:out value="${book.price}" /><br>
+ </body>
+</html>
+//}
+
+ここまでで実際にエラーを検証できる環境が整いましたので、実際にエラーを発生させてみます。フォームに何も入力せずに送信ボタンを押すと価格のみエラーとなります。これは、受け取るフィールドの型の違いのために起こります。書名はString型のためフォームから送られてくる空文字列（""）を受け取るためnullにはなりません。対してpriceは空文字列はInteger型のため空文字列は受け取れずnullになります。そのため、priceのみ@NotNullでエラーとなります。
+
+空文字のチェックのためにはBean Validation標準のアノテーションではなく、HibernateのValiationを使うとできます。この辺りは次回以降に解説していきます。
 
 === ValidatorでDecimalのチェック
 
