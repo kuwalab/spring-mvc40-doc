@@ -426,7 +426,26 @@ private Integer price;
 
 メッセージのデフォルトは、regexp属性の値を表示しますが、ユーザーにはやさしくないため、@Patternのmessage属性で直接指定しています。
 
-=== ValidatorでNotBlankのチェック
+==={validation_not_blank} ValidatorでNotBlankのチェック
+
+@<b>{タグ【018】}
+
+今回はBean ValidationのNotBlankです。
+
+Bean Validationの標準ではなく、Hibernateの実装に含んでいるValidatorになります。これを使うと文字列の空文字のチェックができます。
+
+//list[validation_not_blank-Book.java][Book.java]{
+@NotBlank
+private String name;
+@NotNull
+private Integer price;
+//}
+
+メッセージは以下のようにします。
+
+//list[validation_not_blank-messages.properties][messages.properteis]{
+org.hibernate.validator.constraints.NotBlank.message = 入力は必須です
+//}
 
 === Validatorでロジックを介した検証
 
