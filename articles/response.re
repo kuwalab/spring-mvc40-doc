@@ -105,5 +105,49 @@ public ResponseEntity<String> csvDown2() {
 </html>
 //}
 
+==={csv_download3} CSVファイルのダウンロード（ResponseBody）
+
+@<b>{タグ【024】}
+
+ResponseBodyを返す形で実装します。
+
+ResponseEntityではデータと、ヘッダー、ステータスコードを返せます。
+
+日本語の文字化けをしないようにするために、HttpHeadersクラスのsetContentTypeを使わずに、addメソッドで文字コードと一緒にcontent-typeを指定しています。
+
+CSVデータはただの文字列のデータになります。
+
+//list[csv_download3-ResController.java][ResController.java]{
+@RequestMapping(value = "/csvDown3", method = RequestMethod.GET, produces = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
+        + ";charset=utf-8")
+@ResponseBody
+public String csvDown3(HttpServletResponse response) {
+    response.setHeader("Content-Disposition",
+            "attachment; filename=\"test3.csv\"");
+
+    String csvData = "山田　太郎,33\r\n";
+    csvData = csvData + "田中　花子,29";
+    return csvData;
+}
+//}
+
+アンカーを表示する画面です。単純なアンカーのみです。前回のものに3を追加しています。
+
+//list[csv_download3-csvInit3.jsp][csvInit3.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <a href="csvDown">csvDown</a><br>
+  <a href="csvDown2">csvDown2</a><br>
+  <a href="csvDown3">csvDown3</a>
+ </body>
+</html>
+//}
+
 === Resolverを使う
 
