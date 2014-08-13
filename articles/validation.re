@@ -408,7 +408,23 @@ javax.validation.constraints.Size.message = ${min == max ? min += '文字で入�
 
 メッセージはELで分岐し、最大最小文字が同じ場合と、それ以外で変更しています
 
-=== Validatorで正規表現でのチェック
+==={validation_regexp} Validatorで正規表現でのチェック
+
+@<b>{タグ【017】}
+
+今回はBean Validationの正規表現です。
+
+正規表現なので、色々なパターンのチェックができますが、今回は「ISBN + 数字10桁」のチェックをします。
+
+//list[validation_regexp-Book.java][Book.java]{
+@NotNull
+@Pattern(regexp = "ISBN[0-9]{10}", message = "{0}はISBNを入力してください")
+private String name;
+@NotNull
+private Integer price;
+//}
+
+メッセージのデフォルトは、regexp属性の値を表示しますが、ユーザーにはやさしくないため、@Patternのmessage属性で直接指定しています。
 
 === ValidatorでNotBlankのチェック
 
