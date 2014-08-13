@@ -739,5 +739,39 @@ scopedSession.sessionBook.価格: <c:out value="${model.sessionBook.price}" /><b
 </html>
 //}
 
-=== Flashスコープにデータを格納
+==={scope_flash} Flashスコープにデータを格納
+
+Springではリダイレクト時にリダイレクト先で参照できるRedirectAttributeを使用できます。
+
+//list[scope_flash-ScopeController.java][ScopeController.java]{
+@RequestMapping("/flashScope1")
+public String flashScope1(RedirectAttributes attrs, Model model) {
+    attrs.addFlashAttribute("flash1", "flash1");
+    model.addAttribute("request1", "request1");
+
+    return "redirect:/flashScope2";
+}
+
+@RequestMapping("/flashScope2")
+public String flashScope2() {
+    return "scope/flashScope1";
+}
+//}
+
+表示用のflashScope1.jspは以下のようになります。
+
+//list[scope_flash-flashScope1.jsp][flashScope1.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+flash1: <c:out value="${flash1}" /><br>
+request1: <c:out value="${request1}" />
+ </body>
+</html>
+//}
 
