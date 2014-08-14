@@ -118,7 +118,8 @@ ResponseEntityではデータと、ヘッダー、ステータスコードを返
 CSVデータはただの文字列のデータになります。
 
 //list[csv_download3-ResController.java][ResController.java]{
-@RequestMapping(value = "/csvDown3", method = RequestMethod.GET, produces = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
+@RequestMapping(value = "/csvDown3", method = RequestMethod.GET,
+    produces = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
         + ";charset=utf-8")
 @ResponseBody
 public String csvDown3(HttpServletResponse response) {
@@ -167,7 +168,8 @@ views.xmlは以下になります。
 //list[csv_download4-views.xml][views.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:context="http://www.springframework.org/schema/context"
  xmlns:mvc="http://www.springframework.org/schema/mvc"
  xsi:schemaLocation="http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
