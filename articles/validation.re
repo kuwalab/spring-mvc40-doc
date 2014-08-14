@@ -82,10 +82,10 @@ typeMismatch.java.lang.Integer=整数で入力してください。
 このメッセージは、@<href>{http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/validation/DefaultMessageCodesResolver.html, DefaultMessageCodesResolver}@<fn>{type_check-DefaultMessageCodesResolver}のJavaDocに記載のある通り、
 //footnote[type_check-DefaultMessageCodesResolver][http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/validation@<br>{}/DefaultMessageCodesResolver.html]
 
-1.: code + "." + object name + "." + field
-2.: code + "." + field
-3.: code + "." + field type
-4.: code
+ 1. code + "." + object name + "." + field
+ 2. code + "." + field
+ 3. code + "." + field type
+ 4. code
 
 の順でメッセージが解決されます。
 
