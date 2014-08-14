@@ -79,7 +79,8 @@ book.priceには文字列のためバインディングができずnullが入っ
 typeMismatch.java.lang.Integer=整数で入力してください。
 //}
 
-このメッセージは、<a href="http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/validation/DefaultMessageCodesResolver.html">DefaultMessageCodesResolver</a>のJavaDocに記載のある通り、
+このメッセージは、@<href>{http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/validation/DefaultMessageCodesResolver.html, DefaultMessageCodesResolver}@<fn>{type_check-DefaultMessageCodesResolver}のJavaDocに記載のある通り、
+//footnote[type_check-DefaultMessageCodesResolver][http://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/validation@<br>{}/DefaultMessageCodesResolver.html]
 
 1.: code + "." + object name + "." + field
 2.: code + "." + field
