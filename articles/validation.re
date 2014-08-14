@@ -153,7 +153,8 @@ Bean Validation 1.1本体と、参照実装のHibernate 5.1、また、Bean Vali
 //list[validation_not_null-spring-context.xml][spring-context.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:context="http://www.springframework.org/schema/context"
  xmlns:mvc="http://www.springframework.org/schema/mvc"
  xsi:schemaLocation="http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
@@ -186,9 +187,12 @@ messageSourceを定義し、そのソースをvalidatorに関連付けます。�
 //list[validation_not_null-messages.properties1][messages.properties]{
 javax.validation.constraints.AssertFalse.message = must be false
 javax.validation.constraints.AssertTrue.message = must be true
-javax.validation.constraints.DecimalMax.message = must be less than ${inclusive == true ? 'or equal to ' : ''}{value}
-javax.validation.constraints.DecimalMin.message = must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}
-javax.validation.constraints.Digits.message = numeric value out of bounds (<{integer} digits>.<{fraction} digits> expected)
+javax.validation.constraints.DecimalMax.message =
+   must be less than ${inclusive == true ? 'or equal to ' : ''}{value}
+javax.validation.constraints.DecimalMin.message =
+   must be greater than ${inclusive == true ? 'or equal to ' : ''}{value}
+javax.validation.constraints.Digits.message =
+   numeric value out of bounds (<{integer} digits>.<{fraction} digits> expected)
 javax.validation.constraints.Future.message = must be in the future
 javax.validation.constraints.Max.message = must be less than or equal to {value}
 javax.validation.constraints.Min.message = must be greater than or equal to {value}
@@ -198,25 +202,36 @@ javax.validation.constraints.Past.message = must be in the past
 javax.validation.constraints.Pattern.message = must match "{regexp}"
 javax.validation.constraints.Size.message = size must be between {min} and {max}
 
-org.hibernate.validator.constraints.CreditCardNumber.message = invalid credit card number
+org.hibernate.validator.constraints.CreditCardNumber.message =
+   invalid credit card number
 org.hibernate.validator.constraints.EAN.message = invalid {type} barcode
 org.hibernate.validator.constraints.Email.message = not a well-formed email address
-org.hibernate.validator.constraints.Length.message = length must be between {min} and {max}
-org.hibernate.validator.constraints.LuhnCheck.message = The check digit for ${value} is invalid, Luhn Modulo 10 checksum failed
-org.hibernate.validator.constraints.Mod10Check.message = The check digit for ${value} is invalid, Modulo 10 checksum failed
-org.hibernate.validator.constraints.Mod11Check.message = The check digit for ${value} is invalid, Modulo 11 checksum failed
-org.hibernate.validator.constraints.ModCheck.message = The check digit for ${value} is invalid, ${modType} checksum failed
+org.hibernate.validator.constraints.Length.message =
+   length must be between {min} and {max}
+org.hibernate.validator.constraints.LuhnCheck.message =
+   The check digit for ${value} is invalid, Luhn Modulo 10 checksum failed
+org.hibernate.validator.constraints.Mod10Check.message =
+   The check digit for ${value} is invalid, Modulo 10 checksum failed
+org.hibernate.validator.constraints.Mod11Check.message =
+   The check digit for ${value} is invalid, Modulo 11 checksum failed
+org.hibernate.validator.constraints.ModCheck.message =
+   The check digit for ${value} is invalid, ${modType} checksum failed
 org.hibernate.validator.constraints.NotBlank.message = may not be empty
 org.hibernate.validator.constraints.NotEmpty.message = may not be empty
-org.hibernate.validator.constraints.ParametersScriptAssert.message = script expression "{script}" didn't evaluate to true
+org.hibernate.validator.constraints.ParametersScriptAssert.message =
+   script expression "{script}" didn't evaluate to true
 org.hibernate.validator.constraints.Range.message = must be between {min} and {max}
 org.hibernate.validator.constraints.SafeHtml.message = may have unsafe html content
-org.hibernate.validator.constraints.ScriptAssert.message = script expression "{script}" didn't evaluate to true
+org.hibernate.validator.constraints.ScriptAssert.message =
+   script expression "{script}" didn't evaluate to true
 org.hibernate.validator.constraints.URL.message = must be a valid URL
 
-org.hibernate.validator.constraints.br.CNPJ.message = invalid Brazilian corporate taxpayer registry number (CNPJ)
-org.hibernate.validator.constraints.br.CPF.message = invalid Brazilian individual taxpayer registry number (CPF)
-org.hibernate.validator.constraints.br.TituloEleitoral.message = invalid Brazilian Voter ID card number
+org.hibernate.validator.constraints.br.CNPJ.message =
+   invalid Brazilian corporate taxpayer registry number (CNPJ)
+org.hibernate.validator.constraints.br.CPF.message =
+   invalid Brazilian individual taxpayer registry number (CPF)
+org.hibernate.validator.constraints.br.TituloEleitoral.message =
+   invalid Brazilian Voter ID card number
 //}
 
 このままだと英語だけなので、必要な物から日本語にしていきます。日本語のメッセージリソースは、messages_ja.propertiesというファイル名にして以下の内容にしておきます。
