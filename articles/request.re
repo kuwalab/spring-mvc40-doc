@@ -100,6 +100,28 @@ var1の値は <c:out value="${var1}" />
 </html>
 //}
 
+確認用のテストです。
+
+//list[request_url1-ReqControllerTest.java][ReqControllerTest.java]{
+@Test
+public void pathVar_12345へのGET() throws Exception {
+    mockMvc.perform(get("/pathVar/12345")).andExpect(status().isOk())
+            .andExpect(view().name("req/pathVar"))
+            .andExpect(model().hasNoErrors())
+            .andExpect(request().attribute("var", is("12345")));
+}
+
+@Test
+public void pathVar2_abcdeへのGET() throws Exception {
+    mockMvc.perform(get("/pathVar2/abcde")).andExpect(status().isOk())
+            .andExpect(view().name("req/pathVar"))
+            .andExpect(model().hasNoErrors())
+            .andExpect(request().attribute("var1", is("abcde")));
+}
+//}
+
+テストでは、URLのパラメータがrequestにセットされていることを確認しています。
+
 ==={request_url2} URLの一部をパラメータとして受け取る（複数）
 
 @<b>{タグ【004】}
