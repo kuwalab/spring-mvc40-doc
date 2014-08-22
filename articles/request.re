@@ -359,6 +359,34 @@ fooの値は <c:out value="${foo}" /><br>
 </html>
 //}
 
+テストは以下のとおり。
+
+//list[request_reuqest-ReqControllerTest.java][ReqControllerTest.java]{
+@Test
+public void reqのGET() throws Exception {
+    mockMvc.perform(get("/req").param("foo", "foo"))
+            .andExpect(status().isOk()).andExpect(view().name("req/req"))
+            .andExpect(model().hasNoErrors())
+            .andExpect(request().attribute("foo", is("foo")));
+}
+
+@Test
+public void req2のGET() throws Exception {
+    mockMvc.perform(get("/req2").param("foo", "foo"))
+            .andExpect(status().isOk()).andExpect(view().name("req/req"))
+            .andExpect(model().hasNoErrors())
+            .andExpect(request().attribute("foo", is("foo")));
+}
+
+@Test
+public void req3のGET() throws Exception {
+    mockMvc.perform(get("/req3").param("foo", "foo"))
+            .andExpect(status().isOk()).andExpect(view().name("req/req"))
+            .andExpect(model().hasNoErrors())
+            .andExpect(request().attribute("foo", is("foo")));
+}
+//}
+
 ==={request_reader} Reader/inputStreamで受け取る
 
 @<b>{タグ【008】}
