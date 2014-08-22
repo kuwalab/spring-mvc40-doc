@@ -171,6 +171,38 @@ bar1の値は <c:out value="${bar1}" />
 </html>
 //}
 
+テストは以下のようになります。
+
+//list[request_url2-ReqControllerTest.java][ReqControllerTest.java]{
+@Test
+public void pathVar3_123_abcへのGET() throws Exception {
+    mockMvc.perform(get("/pathVar3/123/abc")).andExpect(status().isOk())
+            .andExpect(view().name("req/pathVar3"))
+            .andExpect(model().hasNoErrors())
+            .andExpect(request().attribute("foo", is("123")))
+            .andExpect(request().attribute("bar", is("abc")));
+}
+
+@Test
+public void pathVar4_123_abcへのGET() throws Exception {
+    mockMvc.perform(get("/pathVar4/123/abc")).andExpect(status().isOk())
+            .andExpect(view().name("req/pathVar3"))
+            .andExpect(model().hasNoErrors())
+            .andExpect(request().attribute("bar1", is("123")))
+            .andExpect(request().attribute("foo1", is("abc")));
+}
+
+@Test
+public void pathVar5_123_param_abcへのGET() throws Exception {
+    mockMvc.perform(get("/pathVar5/123/param/abc"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("req/pathVar3"))
+            .andExpect(model().hasNoErrors())
+            .andExpect(request().attribute("foo", is("123")))
+            .andExpect(request().attribute("bar", is("abc")));
+}
+//}
+
 ==={request_body} リクエストボディをそのまま受け取る
 
 @<b>{タグ【006】}
