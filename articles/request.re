@@ -783,7 +783,7 @@ Model: <c:out value="${requestScope.req3}" />
 
 テストは以下のとおりです。
 
-//list[scope_reuqest1-ReqControllerTest.java][ReqControllerTest.java]{
+//list[scope_reuqest1-ScopeControllerTest.java][ScopeControllerTest.java]{
 @Test
 public void requestScope1のGET() throws Exception {
     MvcResult mvcResult = mockMvc
