@@ -781,6 +781,27 @@ Model: <c:out value="${requestScope.req3}" />
 </html>
 //}
 
+テストは以下のとおりです。
+
+//list[scope_reuqest1-ReqControllerTest.java][ReqControllerTest.java]{
+@Test
+public void requestScope1のGET() throws Exception {
+    MvcResult mvcResult = mockMvc
+            .perform(post("/requestScope1"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("scope/requestScope1"))
+            .andExpect(model().hasNoErrors())
+            .andExpect(
+                    request().attribute("req1", is("httpServletRequest")))
+            .andExpect(request().attribute("req2", is("webRequest")))
+            .andExpect(request().attribute("req3", is("model")))
+            .andExpect(model().attributeExists("req3")).andReturn();
+
+    Map<String, Object> model = mvcResult.getModelAndView().getModel();
+    assertThat(model.get("req3"), is("model"));
+}
+//}
+
 === Beanをリクエストスコープに格納する
 
 ==={scope_session1} セッションスコープにデータを格納
