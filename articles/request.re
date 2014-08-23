@@ -855,6 +855,57 @@ WebRequest: <c:out value="${sessionScope.session2}" /><br>
 </html>
 //}
 
+テストは以下のとおり。
+
+//list[scope_session1-ScopeControllerTest.java][ScopeControllerTest.java]{
+private MockHttpSession mockHttpSession;
+
+@Before
+public void setup() {
+    mockMvc = webAppContextSetup(wac).build();
+    mockHttpSession = new MockHttpSession(wac.getServletContext(), UUID
+            .randomUUID().toString());
+}
+
+@Test
+public void sessionScope1のセッションの維持のテスト() throws Exception {
+    assertThat(mockHttpSession.getAttribute("session1"), is(nullValue()));
+    assertThat(mockHttpSession.getAttribute("session2"), is(nullValue()));
+
+    mockMvc.perform(get("/sessionScope1").session(mockHttpSession))
+            .andExpect(view().name("scope/sessionScope1"));
+
+    assertThat(mockHttpSession.getAttribute("session1"), is("httpSession"));
+    assertThat(mockHttpSession.getAttribute("session2"), is("webRequest"));
+
+    // セッションは維持される
+    mockMvc.perform(get("/sessionScope2").session(mockHttpSession))
+            .andExpect(view().name("scope/sessionScope1"));
+
+    assertThat(mockHttpSession.getAttribute("session1"), is("httpSession"));
+    assertThat(mockHttpSession.getAttribute("session2"), is("webRequest"));
+}
+
+@Test
+public void sessionScope1のセッションの破棄のテスト() throws Exception {
+    assertThat(mockHttpSession.getAttribute("session1"), is(nullValue()));
+    assertThat(mockHttpSession.getAttribute("session2"), is(nullValue()));
+
+    mockMvc.perform(get("/sessionScope1").session(mockHttpSession))
+            .andExpect(view().name("scope/sessionScope1"));
+
+    assertThat(mockHttpSession.getAttribute("session1"), is("httpSession"));
+    assertThat(mockHttpSession.getAttribute("session2"), is("webRequest"));
+
+    // セッションは維持される
+    mockMvc.perform(get("/sessionScope3").session(mockHttpSession))
+            .andExpect(view().name("scope/sessionScope1"));
+
+    assertThat(mockHttpSession.getAttribute("session1"), is(nullValue()));
+    assertThat(mockHttpSession.getAttribute("session2"), is(nullValue()));
+}
+//}
+
 ==={scope_session2} Beanをセッションスコープに格納する
 
 BeanをSessionに登録するためには、web.xmlにRequestContextListenerの設定が必要になります。
