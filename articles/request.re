@@ -574,6 +574,36 @@ customer.ageの値は <c:out value="${customer.age}" /><br>
 </html>
 //}
 
+テストは以下のとおり。
+
+//list[request_class-ReqControllerTest.java][ReqControllerTest.java]{
+@Test
+public void modelFormのGET() throws Exception {
+    mockMvc.perform(get("/modelForm")).andExpect(status().isOk())
+            .andExpect(view().name("req/modelForm"))
+            .andExpect(model().hasNoErrors());
+}
+
+@Test
+public void modelRecvのPOST() throws Exception {
+    MvcResult mvcResult = mockMvc
+            .perform(
+                    post("/modelRecv").param("name", "abc").param("age",
+                            "20")).andExpect(status().isOk())
+            .andExpect(view().name("req/modelRecv"))
+            .andExpect(model().hasNoErrors())
+            .andExpect(model().attributeExists("customer")).andReturn();
+
+    Map<String, Object> model = mvcResult.getModelAndView().getModel();
+    Object customerObject = model.get("customer");
+    assertThat(customerObject, is(notNullValue()));
+    assertThat(customerObject, is(instanceOf(Customer.class)));
+    Customer customer = (Customer) customerObject;
+    assertThat(customer.getName(), is("abc"));
+    assertThat(customer.getAge(), is("20"));
+}
+//}
+
 == ファイルのアップロード
 
 ==={request_upload} Servlet 3.0によるファイルのアップロード
