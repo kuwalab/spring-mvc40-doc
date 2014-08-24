@@ -175,6 +175,71 @@ Controllerクラスには必ず@Controllerアノテーションを付けます�
 
 サーバーを起動して、/にアクセスするとHello worldが表示されます。
 
+==={java_config_test} テストケースを追加する
+
+@<b>{タグ【001】}
+
+Spring MVCではテストもサポートされていて、JUnitによるテストを簡単に記述することができます。
+
+テストを使用するためには、SpringのTestライブラリーと、JUnitを使用する必要があります。
+
+//list[java_config_test-pom.xml][pom.xml]{
+<dependency>
+ <groupId>junit</groupId>
+ <artifactId>junit</artifactId>
+ <version>4.11</version>
+ <scope>test</scope>
+</dependency>
+<dependency>
+ <groupId>org.springframework</groupId>
+ <artifactId>spring-test</artifactId>
+ <version>${spring.version}</version>
+ <scope>test</scope>
+</dependency>
+//}
+
+テストケースは以下のように記述します。
+
+//list[java_config_test-HelloControllerTest.java][HelloControllerTest.java]{
+package com.example.spring.controller;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class HelloControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void indexへのGET() throws Exception {
+        mockMvc.perform(get("/")).andExpect(status().isOk())
+                .andExpect(view().name("hello/index"))
+                .andExpect(model().hasNoErrors());
+    }
+}
+//}
+
 ==={java_config} Javaで設定する
 
 @<b>{タグ【002】}
