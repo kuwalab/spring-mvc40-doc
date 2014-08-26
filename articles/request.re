@@ -908,6 +908,8 @@ public void sessionScope1のセッションの破棄のテスト() throws Except
 
 ==={scope_session2} Beanをセッションスコープに格納する
 
+@<b>{タグ【030】}
+
 BeanをSessionに登録するためには、web.xmlにRequestContextListenerの設定が必要になります。
 
 //list[scope_session2-web.xml][web.xml]{
@@ -980,6 +982,8 @@ scopedSession.sessionBook.価格: <c:out value="${model.sessionBook.price}" /><b
 //}
 
 ==={scope_flash} Flashスコープにデータを格納
+
+@<b>{タグ【031】}
 
 Springではリダイレクト時にリダイレクト先で参照できるRedirectAttributeを使用できます。
 
