@@ -117,6 +117,169 @@ price=価格
 価格は整数で入力してください。
 //}
 
+テストケースは以下のとおり。
+
+//list[type_check-CheckControllerTest.java][TestControllerTest.java]{
+package com.example.spring.controller;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class CheckControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void checkTypeへのGET_priceが1000() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(get("/checkType").param("price", "1000"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("check/checkType"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attributeExists("book")).andReturn();
+
+        Map<String, Object> model = mvcResult.getModelAndView().getModel();
+        Object bookObject = model.get("book");
+        assertThat(bookObject, is(notNullValue()));
+        assertThat(bookObject, is(instanceOf(Book.class)));
+        Book book = (Book) bookObject;
+        assertThat(book.getPrice(), is(1000));
+    }
+
+    @Test
+    public void checkTypeへのGET_priceがabc() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(get("/checkType").param("price", "abc"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("check/checkType"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(model().attributeHasFieldErrors("book", "price"))
+                .andExpect(model().attributeExists("book")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object bookObject = model.get("book");
+        assertThat(bookObject, is(notNullValue()));
+        assertThat(bookObject, is(instanceOf(Book.class)));
+        Book book = (Book) bookObject;
+        assertThat(book.getPrice(), is(nullValue()));
+
+        // エラーメッセージのチェック
+        Object object = mav.getModel().get(
+                "org.springframework.validation.BindingResult.book");
+        assertThat(object, is(not(nullValue())));
+        assertThat(object, is(instanceOf(BindingResult.class)));
+        BindingResult bindingResult = (BindingResult) object;
+
+        // エラーのあるフィールドの取得
+        List<FieldError> list = bindingResult.getFieldErrors("price");
+        assertThat(list, is(not(nullValue())));
+        assertThat(list.size(), is(1));
+
+        // 詳細なエラーチェック
+        FieldError fieldError = list.get(0);
+        assertThat(fieldError.getCode(), is("typeMismatch"));
+
+        // エラーメッセージのパラメータ
+        Object[] args = fieldError.getArguments();
+        assertThat(args.length, is(1));
+        assertThat(args[0],
+                is(instanceOf(DefaultMessageSourceResolvable.class)));
+        DefaultMessageSourceResolvable dmr = (DefaultMessageSourceResolvable) args[0];
+        assertThat(dmr.getCode(), is("price"));
+    }
+}
+//}
+
+Validationでエラーの場合には、エラーメッセージがModelに登録されます。まず、エラーがあるかどうかを@<code>{hasErros()}メソッドで確認できます。また、エラーの総数をerrorCountで確認でき、Modelのどのフィールドに対してエラーがあるのかをattributeHasFieldErrorsメソッドで確認できます。
+
+//emlist{
+MvcResult mvcResult = mockMvc
+        .perform(get("/checkType").param("price", "abc"))
+        .andExpect(status().isOk())
+        .andExpect(view().name("check/checkType"))
+        .andExpect(model().hasErrors())
+        .andExpect(model().errorCount(1))
+        .andExpect(model().attributeHasFieldErrors("book", "price"))
+        .andExpect(model().attributeExists("book")).andReturn();
+//}
+
+Validationで発生したエラーメッセージは、以下のルールでModelに格納されます。
+
+//emlist{
+"org.springframework.validation.BindingResult" + Bean Validationのモデルの名称
+//}
+
+ここでは、bookモデルが対象のため、次のようになります。
+
+//emlist{
+"org.springframework.validation.BindingResult.book"
+//}
+
+Modelには、この属性名でBindingResultのインスタンスが格納されています。そのため、この属性は以下のように取り出し、確認することができます。
+
+//emlist{
+Object object = mav.getModel().get(
+        "org.springframework.validation.BindingResult.book");
+assertThat(object, is(not(nullValue())));
+assertThat(object, is(instanceOf(BindingResult.class)));
+BindingResult bindingResult = (BindingResult) object
+//}
+
+BindingResultからはエラーメッセージのコードを取得することができます。BindingResultからフィールドごとのエラーは、getFieldErrorsメソッドで取り出せます。
+
+//emlist{
+List<FieldError> list = bindingResult.getFieldErrors("price");
+assertThat(list, is(not(nullValue())));
+assertThat(list.size(), is(1));
+//}
+
+getFieldErrorsはFieldErrorクラスのListを取得できます。そこから、FieldErrorを取得し、メッセージのコードを確認します。
+
+//emlist{
+FieldError fieldError = list.get(0);
+assertThat(fieldError.getCode(), is("typeMismatch"));
+Object[] args = fieldError.getArguments();
+assertThat(args.length, is(1));
+assertThat(args[0],
+        is(instanceOf(DefaultMessageSourceResolvable.class)));
+DefaultMessageSourceResolvable dmr = (DefaultMessageSourceResolvable) args[0];
+assertThat(dmr.getCode(), is("price"));
+//}
+
 == JSR349によるvalidation
 
 ==={validation_not_null} Validatorでnullチェック
