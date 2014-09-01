@@ -487,7 +487,9 @@ book.priceの値は <c:out value="${book.price}" /><br>
 
 ここまでで実際にエラーを検証できる環境が整いましたので、実際にエラーを発生させてみます。フォームに何も入力せずに送信ボタンを押すと価格のみエラーとなります。これは、受け取るフィールドの型の違いのために起こります。書名はString型のためフォームから送られてくる空文字列（""）を受け取るためnullにはなりません。対してpriceは空文字列はInteger型のため空文字列は受け取れずnullになります。そのため、priceのみ@NotNullでエラーとなります。
 
-空文字のチェックのためにはBean Validation標準のアノテーションではなく、HibernateのValiationを使うとできます。この辺りは次回以降に解説していきます。
+空文字のチェックのためにはBean Validation標準のアノテーションではなく、HibernateのValiationを使うとできます。この辺りは後述します。
+
+最後に確認用のテストケースです。
 
 //list[validation_not_null-CheckControllerTest.java][CheckControllerTest.java]{
 @Test
@@ -562,7 +564,6 @@ public void bookRecvへのPOST_nameとpriceがnull() throws Exception {
 
 private void checkField(BindingResult bindingResult, String fieldName,
         String errorCode) {
-    // name属性のエラーチェック
     // エラーのあるフィールドの取得
     List<FieldError> list = bindingResult.getFieldErrors(fieldName);
     assertThat(list, is(not(nullValue())));
@@ -609,6 +610,133 @@ javax.validation.constraints.DecimalMin.message = {0}は{value}${inclusive == tr
 //}
 
 メッセージでは、{value}でValidationする値をメッセージに埋め込むことができます。また、EL 3.0による処理でinclusiveの値によってメッセージを変えています。ELが使えることによって、かなり柔軟なメッセージ表示が可能になっています。
+
+テストの実行のために、pom.xmlに以下を追加する必要があります。
+
+//list[validation_decimal-pom.xml][pom.xml]{
+<dependency>
+ <groupId>org.glassfish.web</groupId>
+ <artifactId>el-impl</artifactId>
+ <version>2.2</version>
+ <scope>test</scope>
+</dependency>
+//}
+
+テストケースは以下のとおり。
+
+//list[validation_decimal-CheckControllerTest.java][CheckControllerTest.java]{
+@Test
+public void bookRecvへのPOST_priceが1() throws Exception {
+    MvcResult mvcResult = mockMvc
+            .perform(
+                    post("/bookRecv").param("name", "よく分かるSpring").param(
+                            "price", "1")).andExpect(status().isOk())
+            .andExpect(view().name("check/bookForm"))
+            .andExpect(model().hasErrors())
+            .andExpect(model().errorCount(0))
+            .andExpect(model().attributeExists("book")).andReturn();
+
+    // パラメータのチェック
+    ModelAndView mav = mvcResult.getModelAndView();
+    Map<String, Object> model = mav.getModel();
+    Object bookObject = model.get("book");
+    assertThat(bookObject, is(notNullValue()));
+    assertThat(bookObject, is(instanceOf(Book.class)));
+    Book book = (Book) bookObject;
+    assertThat(book.getName(), is("よく分かるSpring"));
+    assertThat(book.getPrice(), is(1));
+}
+
+@Test
+public void bookRecvへのPOST_priceが0() throws Exception {
+    MvcResult mvcResult = mockMvc
+            .perform(
+                    post("/bookRecv").param("name", "よく分かるSpring").param(
+                            "price", "0")).andExpect(status().isOk())
+            .andExpect(view().name("check/bookForm"))
+            .andExpect(model().hasErrors())
+            .andExpect(model().errorCount(1))
+            .andExpect(model().attributeHasFieldErrors("book", "price"))
+            .andExpect(model().attributeExists("book")).andReturn();
+
+    // パラメータのチェック
+    ModelAndView mav = mvcResult.getModelAndView();
+    Map<String, Object> model = mav.getModel();
+    Object bookObject = model.get("book");
+    assertThat(bookObject, is(notNullValue()));
+    assertThat(bookObject, is(instanceOf(Book.class)));
+    Book book = (Book) bookObject;
+    assertThat(book.getName(), is("よく分かるSpring"));
+    assertThat(book.getPrice(), is(0));
+
+    // エラーメッセージのチェック
+    Object object = mav.getModel().get(
+            "org.springframework.validation.BindingResult.book");
+    assertThat(object, is(not(nullValue())));
+    assertThat(object, is(instanceOf(BindingResult.class)));
+    BindingResult bindingResult = (BindingResult) object;
+
+    checkDecimalField(bindingResult, "price", "DecimalMin", true, "1");
+}
+
+@Test
+public void bookRecvへのPOST_priceが100001() throws Exception {
+    MvcResult mvcResult = mockMvc
+            .perform(
+                    post("/bookRecv").param("name", "よく分かるSpring").param(
+                            "price", "100001")).andExpect(status().isOk())
+            .andExpect(view().name("check/bookForm"))
+            .andExpect(model().hasErrors())
+            .andExpect(model().errorCount(1))
+            .andExpect(model().attributeHasFieldErrors("book", "price"))
+            .andExpect(model().attributeExists("book")).andReturn();
+
+    // パラメータのチェック
+    ModelAndView mav = mvcResult.getModelAndView();
+    Map<String, Object> model = mav.getModel();
+    Object bookObject = model.get("book");
+    assertThat(bookObject, is(notNullValue()));
+    assertThat(bookObject, is(instanceOf(Book.class)));
+    Book book = (Book) bookObject;
+    assertThat(book.getName(), is("よく分かるSpring"));
+    assertThat(book.getPrice(), is(100001));
+
+    // エラーメッセージのチェック
+    Object object = mav.getModel().get(
+            "org.springframework.validation.BindingResult.book");
+    assertThat(object, is(not(nullValue())));
+    assertThat(object, is(instanceOf(BindingResult.class)));
+    BindingResult bindingResult = (BindingResult) object;
+
+    checkDecimalField(bindingResult, "price", "DecimalMax", true, "1");
+}
+
+private void checkDecimalField(BindingResult bindingResult,
+        String fieldName, String errorCode, boolean inclusive, String value) {
+    // エラーのあるフィールドの取得
+    List<FieldError> list = bindingResult.getFieldErrors(fieldName);
+    assertThat(list, is(not(nullValue())));
+    assertThat(list.size(), is(1));
+
+    // 詳細なエラーチェック
+    FieldError fieldError = list.get(0);
+    assertThat(fieldError.getCode(), is(errorCode));
+
+    // エラーメッセージのパラメータ
+    Object[] args = fieldError.getArguments();
+    assertThat(args.length, is(3));
+    assertThat(args[0],
+            is(instanceOf(DefaultMessageSourceResolvable.class)));
+    DefaultMessageSourceResolvable dmr = (DefaultMessageSourceResolvable) args[0];
+    assertThat(dmr.getCode(), is(fieldName));
+    // inclusive
+    assertThat(args[1], is(instanceOf(Boolean.class)));
+    assertThat(args[1], is(inclusive));
+    // value
+    assertThat(args[2], is(instanceOf(String.class)));
+    assertThat(args[2], is(value));
+}
+//}
 
 ==={validation_min_max} ValidatorでMin、Maxのチェック
 
