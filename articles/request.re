@@ -859,27 +859,52 @@ public class C009ControllerTest {
 最初にデータを受け取るクラスを作成します。フィールド名は受け取るパラメータ名と同じにしておきます。
 
 //list[request_class-Customer.java][Customer.java]{
-package com.example.spring.controller;
+package com.example.spring.controller.c010;
 
-public class Customer {
+public class C010Model {
     private String name;
     private String age;
 
-    // setter、getterは省略
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAge() {
+        return age;
+    }
+
+    public void setAge(String age) {
+        this.age = age;
+    }
 }
 //}
 
 コントローラは、@<code>{@ModelAttribute}アノテーションを付けたクラスに、自動的に同名のフィールドにマッピングされます。また、@<code>{@PathVariable}アノテーションと同様に@<code>{@ModelAttribute}アノテーションを付けたインスタンスは、自動的にリクエストスコープに設定されます。@<code>{@PathVariable}と違うのは、オブジェクトそのものがリクエストスコープに設定される点です。
 
 //list[request_class-ReqController.java][ReqController.java]{
-@RequestMapping("/modelForm")
-public String modelForm() {
-    return "req/modelForm";
-}
+package com.example.spring.controller.c010;
 
-@RequestMapping(value = "/modelRecv", method = RequestMethod.POST)
-public String modelRecv(@ModelAttribute Customer customer) {
-    return "req/modelRecv";
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/c010")
+public class C010Controller {
+    @RequestMapping("/modelForm")
+    public String modelForm() {
+        return "c010/modelForm";
+    }
+
+    @RequestMapping(value = "/modelRecv", method = RequestMethod.POST)
+    public String modelRecv(@ModelAttribute C010Model c010Model) {
+        return "c010/modelRecv";
+    }
 }
 //}
 
@@ -916,39 +941,74 @@ public String modelRecv(@ModelAttribute Customer customer) {
  <body>
 nameの値は <c:out value="${name}" /><br>
 ageの値は <c:out value="${age}" /><br>
-customer.nameの値は <c:out value="${customer.name}" /><br>
-customer.ageの値は <c:out value="${customer.age}" /><br>
+customer.nameの値は <c:out value="${c010Model.name}" /><br>
+customer.ageの値は <c:out value="${c010Model.age}" /><br>
  </body>
 </html>
 //}
 
-テストは以下のとおり。
+確認用のテストケースは次のとおりです。
 
 //list[request_class-ReqControllerTest.java][ReqControllerTest.java]{
-@Test
-public void modelFormのGET() throws Exception {
-    mockMvc.perform(get("/modelForm")).andExpect(status().isOk())
-            .andExpect(view().name("req/modelForm"))
-            .andExpect(model().hasNoErrors());
-}
+package com.example.spring.controller.c010;
 
-@Test
-public void modelRecvのPOST() throws Exception {
-    MvcResult mvcResult = mockMvc
-            .perform(
-                    post("/modelRecv").param("name", "abc").param("age",
-                            "20")).andExpect(status().isOk())
-            .andExpect(view().name("req/modelRecv"))
-            .andExpect(model().hasNoErrors())
-            .andExpect(model().attributeExists("customer")).andReturn();
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
-    Map<String, Object> model = mvcResult.getModelAndView().getModel();
-    Object customerObject = model.get("customer");
-    assertThat(customerObject, is(notNullValue()));
-    assertThat(customerObject, is(instanceOf(Customer.class)));
-    Customer customer = (Customer) customerObject;
-    assertThat(customer.getName(), is("abc"));
-    assertThat(customer.getAge(), is("20"));
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.context.WebApplicationContext;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C010ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void modelFormのGET() throws Exception {
+        mockMvc.perform(get("/c010/modelForm")).andExpect(status().isOk())
+                .andExpect(view().name("c010/modelForm"));
+    }
+
+    @Test
+    public void modelRecvのPOST() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c010/modelRecv").param("name", "abc").param(
+                                "age", "20")).andExpect(status().isOk())
+                .andExpect(view().name("c010/modelRecv"))
+                .andExpect(model().attributeExists("c010Model")).andReturn();
+
+        Map<String, Object> model = mvcResult.getModelAndView().getModel();
+        Object c010ModelObject = model.get("c010Model");
+        assertThat(c010ModelObject, is(notNullValue()));
+        assertThat(c010ModelObject, is(instanceOf(C010Model.class)));
+        C010Model c010Model = (C010Model) c010ModelObject;
+        assertThat(c010Model.getName(), is("abc"));
+        assertThat(c010Model.getAge(), is("20"));
+    }
 }
 //}
 
