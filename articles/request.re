@@ -392,15 +392,27 @@ public class C004ControllerTest {
 POSTリクエストのデータは、GETリクエストと同様に@<code>{@RequestParam}で受け取ることもできますが、リクエストボディの生データをそのまま受け取ることもできます。
 
 //list[request_body-ReqController.java][ReqController.java]{
-@RequestMapping("/bodyForm")
-public String bodyForm() {
-    return "req/bodyForm";
-}
+package com.example.spring.controller.c006;
 
-@RequestMapping(value = "/bodyRecv", method = RequestMethod.POST)
-public String bodyRecv(@RequestBody String body, Model model) {
-    model.addAttribute("body", body);
-    return "req/bodyRecv";
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/c006")
+public class C006Controller {
+    @RequestMapping("/bodyForm")
+    public String bodyForm() {
+        return "c006/bodyForm";
+    }
+
+    @RequestMapping(value = "/bodyRecv", method = RequestMethod.POST)
+    public String bodyRecv(@RequestBody String body, Model model) {
+        model.addAttribute("body", body);
+        return "c006/bodyRecv";
+    }
 }
 //}
 
@@ -444,6 +456,56 @@ ageの値は <c:out value="${age}" /><br>
 bodyの値は <c:out value="${body}" /><br>
  </body>
 </html>
+//}
+
+確認用のテストケースは次のとおりです。
+
+//list[request_body-C006ControllerTest.java][C006ControllerTest.java]{
+package com.example.spring.controller.c006;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C006ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void bodyFormのGET() throws Exception {
+        mockMvc.perform(get("/c006/bodyForm")).andExpect(status().isOk())
+                .andExpect(view().name("c006/bodyForm"));
+    }
+
+    // @Test
+    // public void bodyRecvのPOST() throws Exception {
+    // mockMvc.perform(
+    // post("/c006/bodyRecv").param("name", "Spring").param("age",
+    // "40")).andExpect(status().isOk())
+    // .andExpect(view().name("c006/bodyRecv"));
+    // }
+}
 //}
 
 ==={request_request} HttpServletRequestとそれに近いもので受け取る
