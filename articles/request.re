@@ -8,7 +8,7 @@
 
 通常のGETパラメータを受け取るには、@<code>{@RequestParam}アノテーションを使用します。
 
-//list[request_get-C005Controller.java][C005Controller.java]{
+//list[005-C005Controller.java][C005Controller.java]{
 package com.example.spring.controller.c005;
 
 import org.springframework.stereotype.Controller;
@@ -57,7 +57,7 @@ public class C005Controller {
 
 表示用のgetParam.jspは以下のようになります。
 
-//list[request_get-getParam.jsp][getParam.jsp]{
+//list[005-getParam.jsp][getParam.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -76,7 +76,7 @@ modelBarの値は <c:out value="${modelBar}" />
 
 確認用のテストケースは次のとおりです。
 
-//list[request_get-C005ControllerTest.java][C005ControllerTest.java]{
+//list[005-C005ControllerTest.java][C005ControllerTest.java]{
 package com.example.spring.controller.c005;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -166,7 +166,7 @@ public class C005ControllerTest {
 
 リクエストされるURLの一部、例えば/hoge/fooの場合fooの値をパラメータとして受け取る場合には、@<code>{@PathVariable}アノテーションを使って受け取ることができます。
 
-//list[request_url1-C003Controller.java][C003Controller.java]{
+//list[003-C003Controller.java][C003Controller.java]{
 package com.example.spring.controller.c003;
 
 import org.springframework.stereotype.Controller;
@@ -193,7 +193,7 @@ public class C003Controller {
 
 表示用のJSPは以下のようになります。@<code>{@PathVariable}で指定されたパラメータは、Spring MVCによって自動的にリクエストスコープの同名の属性に割り当てられます。そのため、JSP側ではリクエストスコープから値を持ってくるため、コントローラでは何もしていません。
 
-//list[request_url1-pathVar.jsp][pathVar.jsp]{
+//list[003-pathVar.jsp][pathVar.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -210,7 +210,7 @@ var1の値は <c:out value="${var1}" />
 
 確認用のテストケースは次のとおりです。
 
-//list[request_url1-C003ControllerTest.java][C003ControllerTest.java]{
+//list[003-C003ControllerTest.java][C003ControllerTest.java]{
 package com.example.spring.controller.c003;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -269,7 +269,7 @@ URLをパラメータとする場合、そのパラメータは1つでなくて�
 
 具体的なサンプルは以下のとおりです。
 
-//list[request_url2-C004Controller.java][C004Controller.java]{
+//list[004-C004Controller.java][C004Controller.java]{
 package com.example.spring.controller.c004;
 
 import org.springframework.stereotype.Controller;
@@ -304,7 +304,7 @@ public class C004Controller {
 
 最後に表示用のpathVar3.jspは以下になります。
 
-//list[request_url2-pathVar3.jsp][pathVar3.jsp]{
+//list[004-pathVar3.jsp][pathVar3.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -323,7 +323,7 @@ bar1の値は <c:out value="${bar1}" />
 
 確認用のテストケースは次のとおりです。
 
-//list[request_url2-C004ControllerTest.java][C004ControllerTest.java]{
+//list[004-C004ControllerTest.java][C004ControllerTest.java]{
 package com.example.spring.controller.c004;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -391,7 +391,7 @@ public class C004ControllerTest {
 
 POSTリクエストのデータは、GETリクエストと同様に@<code>{@RequestParam}で受け取ることもできますが、リクエストボディの生データをそのまま受け取ることもできます。
 
-//list[request_body-C006Controller.java][C006Controller.java]{
+//list[006-C006Controller.java][C006Controller.java]{
 package com.example.spring.controller.c006;
 
 import org.springframework.stereotype.Controller;
@@ -422,7 +422,7 @@ RequestBodyも必須かどうかはrequired属性で指定できます。
 
 POSTデータ送信用のJSP、bodyForm.jspです。
 
-//list[request_body-bodyForm.jsp][bodyForm.jsp]{
+//list[006-bodyForm.jsp][bodyForm.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -442,7 +442,7 @@ POSTデータ送信用のJSP、bodyForm.jspです。
 
 リクエストボディ表示用のbodyRecv.jspです。
 
-//list[request_body-bodyRecv.jsp][bodyRecv.jsp]{
+//list[006-bodyRecv.jsp][bodyRecv.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -460,7 +460,7 @@ bodyの値は <c:out value="${body}" /><br>
 
 確認用のテストケースは次のとおりです。
 
-//list[request_body-C006ControllerTest.java][C006ControllerTest.java]{
+//list[006-C006ControllerTest.java][C006ControllerTest.java]{
 package com.example.spring.controller.c006;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -514,7 +514,7 @@ public class C006ControllerTest {
 
 ここではHttpServletRequestとSpringで用意されている、Reqeustのようなクラスでのデータの受け取り方です。WebRequestは色々便利に使えますが、今回はHttpServletRequestと同じ動きができるというところだけ確認します。
 
-//list[request_request-C007Controller.java][C007Controller.java]{
+//list[007-C007Controller.java][C007Controller.java]{
 package com.example.spring.controller.c007;
 
 import javax.servlet.http.HttpServletRequest;
@@ -550,7 +550,7 @@ public class C007Controller {
 
 req.jspは以下です。
 
-//list[request_reuqest-req.jsp][req.jsp]{
+//list[007-req.jsp][req.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -566,7 +566,7 @@ fooの値は <c:out value="${foo}" /><br>
 
 確認用のテストケースは次のとおりです。
 
-//list[request_reuqest-C007ControllerTest.java][C007ControllerTest.java]{
+//list[007-C007ControllerTest.java][C007ControllerTest.java]{
 package com.example.spring.controller.c007;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -631,7 +631,7 @@ public class C007ControllerTest {
 
 RequestBodyのデータをReaderやInputStreamで受け取ることができます。今回はより簡単なReaderで受け取っています。読み取った1行目のデータをレスポンスに返しています。
 
-//list[request_reader-C008Controller.java][C008Controller.java]{
+//list[008-C008Controller.java][C008Controller.java]{
 package com.example.spring.controller.c008;
 
 import java.io.BufferedReader;
@@ -661,7 +661,7 @@ public class C008Controller {
 
 POSTデータ送信用のJSP、readerForm.jspです。
 
-//list[request_reader-readerForm.jsp][readerForm.jsp]{
+//list[008-readerForm.jsp][readerForm.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -681,7 +681,7 @@ POSTデータ送信用のJSP、readerForm.jspです。
 
 リクエストボディ表示用のreaderRecv.jspです。
 
-//list[request_reader-readerRecv.jsp][readerRecv.jsp]{
+//list[008-readerRecv.jsp][readerRecv.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -699,7 +699,7 @@ bodyの値は <c:out value="${body}" /><br>
 
 確認用のテストケースは次のとおりです。
 
-//list[request_reader-C008ControllerTest.java][C008ControllerTest.java]{
+//list[008-C008ControllerTest.java][C008ControllerTest.java]{
 package com.example.spring.controller.c008;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -745,7 +745,7 @@ public class C008ControllerTest {
 
 今回はSpringで用意されているHttpEntityクラスでリクエストを受け付けます。
 
-//list[request_entity-C009Controller.java][C009Controller.java]{
+//list[009-C009Controller.java][C009Controller.java]{
 package com.example.spring.controller.c009;
 
 import org.springframework.http.HttpEntity;
@@ -772,7 +772,7 @@ public class C009Controller {
 
 POSTデータ送信用のJSP、entityForm.jspです。
 
-//list[request_entity-entityForm.jsp][entityForm.jsp]{
+//list[009-entityForm.jsp][entityForm.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -792,7 +792,7 @@ POSTデータ送信用のJSP、entityForm.jspです。
 
 リクエストボディ表示用のentityRecv.jspです。
 
-//list[request_entity-entityRecv.jsp][entityRecv.jsp]{
+//list[009-entityRecv.jsp][entityRecv.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -810,7 +810,7 @@ bodyの値は <c:out value="${body}" /><br>
 
 確認用のテストケースは次のとおりです。
 
-//list[request_entity-C009ControllerTest.java][C009ControllerTest.java]{
+//list[009-C009ControllerTest.java][C009ControllerTest.java]{
 package com.example.spring.controller.c009;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -858,7 +858,7 @@ public class C009ControllerTest {
 
 最初にデータを受け取るクラスを作成します。フィールド名は受け取るパラメータ名と同じにしておきます。
 
-//list[request_class-C010Model.java][C010Model.java]{
+//list[010-C010Model.java][C010Model.java]{
 package com.example.spring.controller.c010;
 
 public class C010Model {
@@ -885,7 +885,7 @@ public class C010Model {
 
 コントローラは、@<code>{@ModelAttribute}アノテーションを付けたクラスに、自動的に同名のフィールドにマッピングされます。また、@<code>{@PathVariable}アノテーションと同様に@<code>{@ModelAttribute}アノテーションを付けたインスタンスは、自動的にリクエストスコープに設定されます。@<code>{@PathVariable}と違うのは、オブジェクトそのものがリクエストスコープに設定される点です。
 
-//list[request_class-C010Controller.java][C010Controller.java]{
+//list[010-C010Controller.java][C010Controller.java]{
 package com.example.spring.controller.c010;
 
 import org.springframework.stereotype.Controller;
@@ -910,7 +910,7 @@ public class C010Controller {
 
 データを送信する、modelForm.jspです。
 
-//list[request_class-modelForm.jsp][modelForm.jsp]{
+//list[010-modelForm.jsp][modelForm.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -930,7 +930,7 @@ public class C010Controller {
 
 データを受信する、modelRecv.jspです。
 
-//list[request_class-modelRecv.jsp][modelRecv.jsp]{
+//list[010-modelRecv.jsp][modelRecv.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -949,7 +949,7 @@ customer.ageの値は <c:out value="${c010Model.age}" /><br>
 
 確認用のテストケースは次のとおりです。
 
-//list[request_class-C010ControllerTest.java][C010ControllerTest.java]{
+//list[010-C010ControllerTest.java][C010ControllerTest.java]{
 package com.example.spring.controller.c010;
 
 import static org.hamcrest.CoreMatchers.*;
