@@ -746,15 +746,27 @@ public class C008ControllerTest {
 今回はSpringで用意されているHttpEntityクラスでリクエストを受け付けます。
 
 //list[request_entity-ReqController.java][ReqController.java]{
-@RequestMapping("/entityForm")
-public String entityForm() {
-    return "req/entityForm";
-}
+package com.example.spring.controller.c009;
 
-@RequestMapping(value = "/entityRecv", method = RequestMethod.POST)
-public String entityRecv(HttpEntity<String> httpEntity, Model model) {
-    model.addAttribute("body", httpEntity.getBody());
-    return "req/entityRecv";
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/c009")
+public class C009Controller {
+    @RequestMapping("/entityForm")
+    public String entityForm() {
+        return "c009/entityForm";
+    }
+
+    @RequestMapping(value = "/entityRecv", method = RequestMethod.POST)
+    public String entityRecv(HttpEntity<String> httpEntity, Model model) {
+        model.addAttribute("body", httpEntity.getBody());
+        return "c009/entityRecv";
+    }
 }
 //}
 
@@ -794,6 +806,48 @@ ageの値は <c:out value="${age}" /><br>
 bodyの値は <c:out value="${body}" /><br>
  </body>
 </html>
+//}
+
+確認用のテストケースは次のとおりです。
+
+//list[request_entity-C009ControllerTest.java][C009ControllerTest.java]{
+package com.example.spring.controller.c009;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C009ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void readerFormのGET() throws Exception {
+        mockMvc.perform(get("/c009/entityForm")).andExpect(status().isOk())
+                .andExpect(view().name("c009/entityForm"));
+    }
+}
 //}
 
 ==={request_class} 任意のクラス（モデル）で受け取る
