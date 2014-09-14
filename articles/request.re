@@ -2,7 +2,7 @@
 
 == リクエストの色々な受け取り方
 
-==={request_get} GETパラメータを受け取る
+==={005} GETパラメータを受け取る
 
 @<b>{タグ【005】}
 
@@ -160,7 +160,7 @@ public class C005ControllerTest {
 }
 //}
 
-==={request_url1} URLの一部をパラメータとして受け取る
+==={003} URLの一部をパラメータとして受け取る
 
 @<b>{タグ【003】}
 
@@ -261,7 +261,7 @@ public class C003ControllerTest {
 
 テストでは、URLのパラメータがrequestにセットされていることを確認しています。
 
-==={request_url2} URLの一部をパラメータとして受け取る（複数）
+==={004} URLの一部をパラメータとして受け取る（複数）
 
 @<b>{タグ【004】}
 
@@ -385,7 +385,7 @@ public class C004ControllerTest {
 }
 //}
 
-==={request_body} リクエストボディをそのまま受け取る
+==={006} リクエストボディをそのまま受け取る
 
 @<b>{タグ【006】}
 
@@ -508,7 +508,7 @@ public class C006ControllerTest {
 }
 //}
 
-==={request_request} HttpServletRequestとそれに近いもので受け取る
+==={007} HttpServletRequestとそれに近いもので受け取る
 
 @<b>{タグ【007】}
 
@@ -625,7 +625,7 @@ public class C007ControllerTest {
 }
 //}
 
-==={request_reader} Reader/inputStreamで受け取る
+==={008} Reader/inputStreamで受け取る
 
 @<b>{タグ【008】}
 
@@ -739,7 +739,7 @@ public class C008ControllerTest {
 }
 //}
 
-==={request_entity} HttpEntityで受け取る
+==={009} HttpEntityで受け取る
 
 @<b>{タグ【009】}
 
@@ -850,7 +850,7 @@ public class C009ControllerTest {
 }
 //}
 
-==={request_class} 任意のクラス（モデル）で受け取る
+==={010} 任意のクラス（モデル）で受け取る
 
 @<b>{タグ【010】}
 
