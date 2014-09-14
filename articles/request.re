@@ -515,22 +515,36 @@ public class C006ControllerTest {
 ここではHttpServletRequestとSpringで用意されている、Reqeustのようなクラスでのデータの受け取り方です。WebRequestは色々便利に使えますが、今回はHttpServletRequestと同じ動きができるというところだけ確認します。
 
 //list[request_request-ReqController.java][ReqController.java]{
-@RequestMapping("/req")
-public String req(HttpServletRequest request, Model model) {
-    model.addAttribute("foo", request.getParameter("foo"));
-    return "req/req";
-}
+package com.example.spring.controller.c007;
 
-@RequestMapping("/req2")
-public String req2(WebRequest request, Model model) {
-    model.addAttribute("foo", request.getParameter("foo"));
-    return "req/req";
-}
+import javax.servlet.http.HttpServletRequest;
 
-@RequestMapping("/req3")
-public String req3(NativeWebRequest request, Model model) {
-    model.addAttribute("foo", request.getParameter("foo"));
-    return "req/req";
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.context.request.WebRequest;
+
+@Controller
+@RequestMapping("/c007")
+public class C007Controller {
+    @RequestMapping("/req")
+    public String req(HttpServletRequest request, Model model) {
+        model.addAttribute("foo", request.getParameter("foo"));
+        return "c007/req";
+    }
+
+    @RequestMapping("/req2")
+    public String req2(WebRequest request, Model model) {
+        model.addAttribute("foo", request.getParameter("foo"));
+        return "c007/req";
+    }
+
+    @RequestMapping("/req3")
+    public String req3(NativeWebRequest request, Model model) {
+        model.addAttribute("foo", request.getParameter("foo"));
+        return "c007/req";
+    }
 }
 //}
 
@@ -550,31 +564,64 @@ fooの値は <c:out value="${foo}" /><br>
 </html>
 //}
 
-テストは以下のとおり。
+確認用のテストケースは次のとおりです。
 
 //list[request_reuqest-ReqControllerTest.java][ReqControllerTest.java]{
-@Test
-public void reqのGET() throws Exception {
-    mockMvc.perform(get("/req").param("foo", "foo"))
-            .andExpect(status().isOk()).andExpect(view().name("req/req"))
-            .andExpect(model().hasNoErrors())
-            .andExpect(request().attribute("foo", is("foo")));
-}
+package com.example.spring.controller.c007;
 
-@Test
-public void req2のGET() throws Exception {
-    mockMvc.perform(get("/req2").param("foo", "foo"))
-            .andExpect(status().isOk()).andExpect(view().name("req/req"))
-            .andExpect(model().hasNoErrors())
-            .andExpect(request().attribute("foo", is("foo")));
-}
+import static org.hamcrest.CoreMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
-@Test
-public void req3のGET() throws Exception {
-    mockMvc.perform(get("/req3").param("foo", "foo"))
-            .andExpect(status().isOk()).andExpect(view().name("req/req"))
-            .andExpect(model().hasNoErrors())
-            .andExpect(request().attribute("foo", is("foo")));
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C007ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void reqのGET() throws Exception {
+        mockMvc.perform(get("/c007/req").param("foo", "foo"))
+                .andExpect(status().isOk()).andExpect(view().name("c007/req"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(request().attribute("foo", is("foo")));
+    }
+
+    @Test
+    public void req2のGET() throws Exception {
+        mockMvc.perform(get("/c007/req2").param("foo", "foo"))
+                .andExpect(status().isOk()).andExpect(view().name("c007/req"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(request().attribute("foo", is("foo")));
+    }
+
+    @Test
+    public void req3のGET() throws Exception {
+        mockMvc.perform(get("/c007/req3").param("foo", "foo"))
+                .andExpect(status().isOk()).andExpect(view().name("c007/req"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(request().attribute("foo", is("foo")));
+    }
 }
 //}
 
