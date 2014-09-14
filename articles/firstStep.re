@@ -17,7 +17,7 @@ Spring MVCに必要なライブラリーは依存関係が複雑で大変なた�
 
 Mavenのためのpom.xmlの必要なライブラリーの設定です。
 
-//list[web_xml-pom.xml][pom.xmlのdependencies部分]{
+//list[001-pom.xml][pom.xmlのdependencies部分]{
 <dependency>
  <groupId>org.springframework</groupId>
  <artifactId>spring-webmvc</artifactId>
@@ -153,7 +153,7 @@ Spring MVCのテストのために、次のライブラリーを指定してい�
 
 続いて、Deployment descriptorになります。Springに必要な設定をweb.xmlに記載します。
 
-//list[web_xml-web.xml][web.xml]{
+//list[001-web.xml][web.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xmlns="http://xmlns.jcp.org/xml/ns/javaee"
@@ -217,7 +217,7 @@ Spring MVCのテストのために、次のライブラリーを指定してい�
 
 続いて、web.xmlの中で指定したcontextConfigLocationのファイルの中身を確認します。このファイルがSpringの設定の本体になります。
 
-//list[web_xml-spring-context.xml][WEB-INF/spring/spring-context.xml]{
+//list[001-spring-context.xml][WEB-INF/spring/spring-context.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -250,7 +250,7 @@ component-scanで、Springのコンポーネントを検索するパッケージ
 
 次は、web.xmlで指定したcommon.jspの設定です。JSTLやSpringのタグライブラリーを指定しておきます。必要に応じて設定してください。
 
-//list[web_xml-common.jsp][WEB-INF/jsp/common/common.jsp]{
+//list[001_xml-common.jsp][WEB-INF/jsp/common/common.jsp]{
 <%@page language="java"  pageEncoding="utf-8" %><%--
 --%><%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %><%--
 --%><%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %><%--
@@ -260,7 +260,7 @@ component-scanで、Springのコンポーネントを検索するパッケージ
 
 実際に表示に使用するJSPです。
 
-//list[web_xml-index.jsp][WEB-INF/jsp/hello/index.jsp]{
+//list[001-index.jsp][WEB-INF/jsp/hello/index.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -277,7 +277,7 @@ Hello world<br>
 
 最後にコントローラクラスです。何もせずJSPにフォワードしています。
 
-//list[web_xml-C001Controller.java][C001Controller.java]{
+//list[001-C001Controller.java][C001Controller.java]{
 package com.example.spring.controller.c001;
 
 import org.springframework.stereotype.Controller;
@@ -299,7 +299,7 @@ Controllerクラスには必ず@Controllerアノテーションを付けます�
 
 確認用のテストケースは次のとおりです。
 
-//list[web_xml-C001ControllerTest.java][C001ControllerTest.java]{
+//list[001-C001ControllerTest.java][C001ControllerTest.java]{
 package com.example.spring.controller.c001;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -349,7 +349,7 @@ Java EE 6からプログラムからServletやFilterを登録できるように�
 
 まず、web.xmlの中のJavaコードに置き換えられる部分を削除します。
 
-//list[java_config-web.xml][web.xml]{
+//list[002-web.xml][web.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xmlns="http://xmlns.jcp.org/xml/ns/javaee"
@@ -373,7 +373,7 @@ web.xmlでは、ServletとFilterの設定を除去しています。
 
 ついで、@<code>{WebApplicationInitializer}を実装した、MyWebApplicationInitializerを作成します。
 
-//list[java_config-MyWebApplicationInitializer][MyWebApplicationInitializer]{
+//list[002-MyWebApplicationInitializer][MyWebApplicationInitializer]{
 package com.example.spring;
 
 import javax.servlet.FilterRegistration;
