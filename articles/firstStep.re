@@ -11,38 +11,145 @@ Spring MVCは依存ライブラリーが多く、Mavenを使わない場合に�
 
 @<b>{タグ【001】}
 
-Springに必要なライブラリーは依存関係が複雑で大変なためMavenで導入するのが簡単です。pom.xmlの依存関係の部分のみ記載します。
+最初のサンプルは、Spring MVCでHello worldを表示する最低限のプログラムです。これ以降の基本となる>部分です。
+
+Spring MVCに必要なライブラリーは依存関係が複雑で大変なため、Mavenで導入するのが簡単です。
+
+Mavenのためのpom.xmlの必要なライブラリーの設定です。
 
 //list[web_xml-pom.xml][pom.xmlのdependencies部分]{
-<dependencies>
- <!-- Spring Framework -->
- <dependency>
-  <groupId>org.springframework</groupId>
-  <artifactId>spring-webmvc</artifactId>
-  <version>4.0.6.RELEASE</version>
- </dependency>
- <!-- Servlet -->
- <dependency>
-  <groupId>javax.servlet</groupId>
-  <artifactId>javax.servlet-api</artifactId>
-  <version>3.1.0</version>
-  <scope>provided</scope>
- </dependency>
- <dependency>
-  <groupId>javax.servlet.jsp</groupId>
-  <artifactId>javax.servlet.jsp-api</artifactId>
-  <version>2.3.1</version>
-  <scope>provided</scope>
- </dependency>
- <dependency>
-  <groupId>javax.servlet</groupId>
-  <artifactId>jstl</artifactId>
-  <version>1.2</version>
- </dependency>
-</dependencies>
+<dependency>
+ <groupId>org.springframework</groupId>
+ <artifactId>spring-webmvc</artifactId>
+ <version>${spring.version}</version>
+</dependency>
+<dependency>
+ <groupId>javax.servlet</groupId>
+ <artifactId>javax.servlet-api</artifactId>
+ <version>3.1.0</version>
+ <scope>provided</scope>
+</dependency>
+<dependency>
+ <groupId>javax.servlet.jsp</groupId>
+ <artifactId>javax.servlet.jsp-api</artifactId>
+ <version>2.3.1</version>
+ <scope>provided</scope>
+</dependency>
+<dependency>
+ <groupId>javax.servlet</groupId>
+ <artifactId>jstl</artifactId>
+ <version>1.2</version>
+</dependency>
+<dependency>
+ <groupId>javax.el</groupId>
+ <artifactId>javax.el-api</artifactId>
+ <version>3.0.0</version>
+ <scope>provided</scope>
+</dependency>
+<dependency>
+ <groupId>javax.validation</groupId>
+ <artifactId>validation-api</artifactId>
+ <version>1.1.0.Final</version>
+</dependency>
+<dependency>
+ <groupId>org.hibernate</groupId>
+ <artifactId>hibernate-validator</artifactId>
+ <version>5.1.2.Final</version>
+</dependency>
+<dependency>
+ <groupId>ch.qos.logback</groupId>
+ <artifactId>logback-classic</artifactId>
+ <version>1.1.2</version>
+</dependency>
+<dependency>
+ <groupId>org.slf4j</groupId>
+ <artifactId>jcl-over-slf4j</artifactId>
+ <version>1.7.7</version>
+</dependency>
+<dependency>
+ <groupId>junit</groupId>
+ <artifactId>junit</artifactId>
+ <version>4.11</version>
+ <scope>test</scope>
+</dependency>
+<dependency>
+ <groupId>org.springframework</groupId>
+ <artifactId>spring-test</artifactId>
+ <version>${spring.version}</version>
+ <scope>test</scope>
+</dependency>
+<dependency>
+ <groupId>org.glassfish.web</groupId>
+ <artifactId>el-impl</artifactId>
+ <version>2.2</version>
+ <scope>test</scope>
+</dependency>
 //}
 
-Springのライブラリーは、spring-webmvcを指定することで必要な物がひと通り揃います。後は、コンパイル用のServlet／JSPのAPIとJSTLタグライブラリーを入れておけばいいかと思います。
+Springのライブラリーは、spring-webmvcを指定することで必要な物がひと通り揃います。後は、コンパイル用のServlet／JSPのAPIとJSTLタグライブラリーを入れておくことが必要です。
+
+javax.el以降のライブラリーに関しては、オプションのライブラリーになります。それぞれを簡単に解説します。
+
+最初は、Bean Validationに必要なライブラリーです。
+
+//emlist{
+<dependency>
+ <groupId>javax.el</groupId>
+ <artifactId>javax.el-api</artifactId>
+ <version>3.0.0</version>
+ <scope>provided</scope>
+</dependency>
+<dependency>
+ <groupId>javax.validation</groupId>
+ <artifactId>validation-api</artifactId>
+ <version>1.1.0.Final</version>
+</dependency>
+<dependency>
+ <groupId>org.hibernate</groupId>
+ <artifactId>hibernate-validator</artifactId>
+ <version>5.1.2.Final</version>
+</dependency>
+//}
+
+ログ出力用に次のライブラリーを次の部分で指定しています。
+
+//emlist{
+<dependency>
+ <groupId>ch.qos.logback</groupId>
+ <artifactId>logback-classic</artifactId>
+ <version>1.1.2</version>
+</dependency>
+<dependency>
+ <groupId>org.slf4j</groupId>
+ <artifactId>jcl-over-slf4j</artifactId>
+ <version>1.7.7</version>
+</dependency>
+//}
+
+Spring MVCのテストのために、次のライブラリーを指定しています。
+
+//emlist{
+<dependency>
+ <groupId>junit</groupId>
+ <artifactId>junit</artifactId>
+ <version>4.11</version>
+ <scope>test</scope>
+</dependency>
+<dependency>
+ <groupId>org.springframework</groupId>
+ <artifactId>spring-test</artifactId>
+ <version>${spring.version}</version>
+ <scope>test</scope>
+</dependency>
+<dependency>
+ <groupId>org.glassfish.web</groupId>
+ <artifactId>el-impl</artifactId>
+ <version>2.2</version>
+ <scope>test</scope>
+</dependency>
+//}
+
+依存ライブラリーは以上です。オプションのライブラリーは使用する場合に追加してください。
 
 続いて、Deployment descriptorになります。Springに必要な設定をweb.xmlに記載します。
 
@@ -50,10 +157,17 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xmlns="http://xmlns.jcp.org/xml/ns/javaee"
- xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
+  xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp"
  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
   http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
  version="3.1">
+ <listener>
+  <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+ </listener>
+ <context-param>
+  <param-name>contextConfigLocation</param-name>
+  <param-value>/WEB-INF/spring/spring-context.xml</param-value>
+ </context-param>
  <filter>
   <filter-name>CharacterEncodingFilter</filter-name>
   <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -75,8 +189,9 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
   <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
   <init-param>
    <param-name>contextConfigLocation</param-name>
-   <param-value>/WEB-INF/spring/spring-context.xml</param-value>
+   <param-value></param-value>
   </init-param>
+  <load-on-startup>1</load-on-startup>
  </servlet>
  <servlet-mapping>
   <servlet-name>dispatcher</servlet-name>
@@ -94,7 +209,7 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 </web-app>
 //}
 
-長いですが、おおよそ定型句です。
+長いですが、ほぼ決まりきった書き方になります。
 
 まずfilterですが、requestとresponseの文字コードの指定を毎回しなくていいようにCharacterEncodingFilterを設定します。使用する文字コードに合わせて設定してください。最近はほとんどの場合でutf-8一だと思います。
 
@@ -107,12 +222,18 @@ Springのライブラリーは、spring-webmvcを指定することで必要な�
 <beans xmlns="http://www.springframework.org/schema/beans"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xmlns:context="http://www.springframework.org/schema/context"
+ xmlns:mvc="http://www.springframework.org/schema/mvc"
  xsi:schemaLocation="http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
 http://www.springframework.org/schema/context
-http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
  <mvc:annotation-driven />
- <context:component-scan base-package="com.example.spring" />
+ <context:component-scan base-package="com.example.spring">
+  <context:exclude-filter type="regex"
+   expression="com\.example\.spring\.controller\..*Test" />
+ </context:component-scan>
  <bean
   class="org.springframework.web.servlet.view.InternalResourceViewResolver">
   <property name="prefix" value="/WEB-INF/jsp/" />
@@ -156,53 +277,30 @@ Hello world<br>
 
 最後にコントローラクラスです。何もせずJSPにフォワードしています。
 
-//list[web_xml-HelloController.java][HelloController.java]{
-package com.example.spring.controller;
+//list[web_xml-C001Controller.java][C001Controller.java]{
+package com.example.spring.controller.c001;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
-public class HelloController {
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+public class C001Controller {
+    @RequestMapping(value = "/c001", method = RequestMethod.GET)
     public String index() {
-        return "hello/index";
+        return "c001/index";
     }
 }
 //}
 
 Controllerクラスには必ず@Controllerアノテーションを付けます。実際にリクエストを受け付けるメソッドには@RequestMappingアノテーションを付けます。この例では/へのGETメソッドのリクエストを受けつけ、/WEB-INF/jsp/hello/index.jspのJSPへフォワードします。
 
-サーバーを起動して、/にアクセスするとHello worldが表示されます。
+サーバーを起動して、/c001にアクセスするとHello worldが表示されます。
 
-==={java_config_test} テストケースを追加する
+確認用のテストケースは次のとおりです。
 
-@<b>{タグ【001】}
-
-Spring MVCではテストもサポートされていて、JUnitによるテストを簡単に記述することができます。
-
-テストを使用するためには、SpringのTestライブラリーと、JUnitを使用する必要があります。
-
-//list[java_config_test-pom.xml][pom.xml]{
-<dependency>
- <groupId>junit</groupId>
- <artifactId>junit</artifactId>
- <version>4.11</version>
- <scope>test</scope>
-</dependency>
-<dependency>
- <groupId>org.springframework</groupId>
- <artifactId>spring-test</artifactId>
- <version>${spring.version}</version>
- <scope>test</scope>
-</dependency>
-//}
-
-テストケースは以下のように記述します。
-
-//list[java_config_test-HelloControllerTest.java][HelloControllerTest.java]{
-package com.example.spring.controller;
+//list[web_xml-C001ControllerTest.java][C001ControllerTest.java]{
+package com.example.spring.controller.c001;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -220,8 +318,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
-public class HelloControllerTest {
+@ContextConfiguration(locations = {
+  "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C001ControllerTest {
     @Autowired
     private WebApplicationContext wac;
 
@@ -233,10 +332,9 @@ public class HelloControllerTest {
     }
 
     @Test
-    public void indexへのGET() throws Exception {
-        mockMvc.perform(get("/")).andExpect(status().isOk())
-                .andExpect(view().name("hello/index"))
-                .andExpect(model().hasNoErrors());
+    public void checkTypeへのGET_priceが1000() throws Exception {
+        mockMvc.perform(get("/c001")).andExpect(status().isOk())
+                .andExpect(view().name("c001/index"));
     }
 }
 //}
@@ -284,6 +382,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
 import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.DispatcherServlet;
 
@@ -291,12 +390,15 @@ public class MyWebApplicationInitializer implements WebApplicationInitializer {
 
     @Override
     public void onStartup(ServletContext context) throws ServletException {
-        ServletRegistration.Dynamic dispacherServlet = context.addServlet(
-                "dispatcher", new DispatcherServlet());
-        dispacherServlet.setLoadOnStartup(1);
-        dispacherServlet.addMapping("/");
-        dispacherServlet.setInitParameter("contextConfigLocation",
+        context.addListener(new ContextLoaderListener());
+        context.setInitParameter("contextConfigLocation",
                 "/WEB-INF/spring/spring-context.xml");
+
+        ServletRegistration.Dynamic dispatcherServlet = context.addServlet(
+                "dispatcher", new DispatcherServlet());
+        dispatcherServlet.setInitParameter("contextConfigLocation", "");
+        dispatcherServlet.setLoadOnStartup(1);
+        dispatcherServlet.addMapping("/");
 
         FilterRegistration.Dynamic characterEncodingFilter = context.addFilter(
                 "CharacterEncodingFilter", new CharacterEncodingFilter());
