@@ -8,7 +8,7 @@
 
 通常のGETパラメータを受け取るには、@<code>{@RequestParam}アノテーションを使用します。
 
-//list[request_get-ReqController.java][ReqController.java]{
+//list[request_get-C005Controller.java][C005Controller.java]{
 package com.example.spring.controller.c005;
 
 import org.springframework.stereotype.Controller;
@@ -76,7 +76,7 @@ modelBarの値は <c:out value="${modelBar}" />
 
 確認用のテストケースは次のとおりです。
 
-//list[request_get-ReqControllerTest.java][ReqControllerTest.java]{
+//list[request_get-C005ControllerTest.java][C005ControllerTest.java]{
 package com.example.spring.controller.c005;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -166,7 +166,7 @@ public class C005ControllerTest {
 
 リクエストされるURLの一部、例えば/hoge/fooの場合fooの値をパラメータとして受け取る場合には、@<code>{@PathVariable}アノテーションを使って受け取ることができます。
 
-//list[request_url1-ReqController.java][ReqController.java]{
+//list[request_url1-C003Controller.java][C003Controller.java]{
 package com.example.spring.controller.c003;
 
 import org.springframework.stereotype.Controller;
@@ -210,7 +210,7 @@ var1の値は <c:out value="${var1}" />
 
 確認用のテストケースは次のとおりです。
 
-//list[request_url1-ReqControllerTest.java][ReqControllerTest.java]{
+//list[request_url1-C003ControllerTest.java][C003ControllerTest.java]{
 package com.example.spring.controller.c003;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -269,7 +269,7 @@ URLをパラメータとする場合、そのパラメータは1つでなくて�
 
 具体的なサンプルは以下のとおりです。
 
-//list[request_url2-ReqController.java][ReqController.java]{
+//list[request_url2-C004Controller.java][C004Controller.java]{
 package com.example.spring.controller.c004;
 
 import org.springframework.stereotype.Controller;
@@ -323,7 +323,7 @@ bar1の値は <c:out value="${bar1}" />
 
 確認用のテストケースは次のとおりです。
 
-//list[request_url2-ReqControllerTest.java][ReqControllerTest.java]{
+//list[request_url2-C004ControllerTest.java][C004ControllerTest.java]{
 package com.example.spring.controller.c004;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -391,7 +391,7 @@ public class C004ControllerTest {
 
 POSTリクエストのデータは、GETリクエストと同様に@<code>{@RequestParam}で受け取ることもできますが、リクエストボディの生データをそのまま受け取ることもできます。
 
-//list[request_body-ReqController.java][ReqController.java]{
+//list[request_body-C006Controller.java][C006Controller.java]{
 package com.example.spring.controller.c006;
 
 import org.springframework.stereotype.Controller;
@@ -514,7 +514,7 @@ public class C006ControllerTest {
 
 ここではHttpServletRequestとSpringで用意されている、Reqeustのようなクラスでのデータの受け取り方です。WebRequestは色々便利に使えますが、今回はHttpServletRequestと同じ動きができるというところだけ確認します。
 
-//list[request_request-ReqController.java][ReqController.java]{
+//list[request_request-C007Controller.java][C007Controller.java]{
 package com.example.spring.controller.c007;
 
 import javax.servlet.http.HttpServletRequest;
@@ -566,7 +566,7 @@ fooの値は <c:out value="${foo}" /><br>
 
 確認用のテストケースは次のとおりです。
 
-//list[request_reuqest-ReqControllerTest.java][ReqControllerTest.java]{
+//list[request_reuqest-C007ControllerTest.java][C007ControllerTest.java]{
 package com.example.spring.controller.c007;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -631,7 +631,7 @@ public class C007ControllerTest {
 
 RequestBodyのデータをReaderやInputStreamで受け取ることができます。今回はより簡単なReaderで受け取っています。読み取った1行目のデータをレスポンスに返しています。
 
-//list[request_reader-ReqController.java][ReqController.java]{
+//list[request_reader-C008Controller.java][C008Controller.java]{
 package com.example.spring.controller.c008;
 
 import java.io.BufferedReader;
@@ -745,7 +745,7 @@ public class C008ControllerTest {
 
 今回はSpringで用意されているHttpEntityクラスでリクエストを受け付けます。
 
-//list[request_entity-ReqController.java][ReqController.java]{
+//list[request_entity-C009Controller.java][C009Controller.java]{
 package com.example.spring.controller.c009;
 
 import org.springframework.http.HttpEntity;
@@ -858,7 +858,7 @@ public class C009ControllerTest {
 
 最初にデータを受け取るクラスを作成します。フィールド名は受け取るパラメータ名と同じにしておきます。
 
-//list[request_class-Customer.java][Customer.java]{
+//list[request_class-C010Model.java][C010Model.java]{
 package com.example.spring.controller.c010;
 
 public class C010Model {
@@ -885,7 +885,7 @@ public class C010Model {
 
 コントローラは、@<code>{@ModelAttribute}アノテーションを付けたクラスに、自動的に同名のフィールドにマッピングされます。また、@<code>{@PathVariable}アノテーションと同様に@<code>{@ModelAttribute}アノテーションを付けたインスタンスは、自動的にリクエストスコープに設定されます。@<code>{@PathVariable}と違うのは、オブジェクトそのものがリクエストスコープに設定される点です。
 
-//list[request_class-ReqController.java][ReqController.java]{
+//list[request_class-C010Controller.java][C010Controller.java]{
 package com.example.spring.controller.c010;
 
 import org.springframework.stereotype.Controller;
@@ -949,7 +949,7 @@ customer.ageの値は <c:out value="${c010Model.age}" /><br>
 
 確認用のテストケースは次のとおりです。
 
-//list[request_class-ReqControllerTest.java][ReqControllerTest.java]{
+//list[request_class-C010ControllerTest.java][C010ControllerTest.java]{
 package com.example.spring.controller.c010;
 
 import static org.hamcrest.CoreMatchers.*;
