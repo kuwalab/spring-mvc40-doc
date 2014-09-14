@@ -9,28 +9,39 @@
 通常のGETパラメータを受け取るには、@<code>{@RequestParam}アノテーションを使用します。
 
 //list[request_get-ReqController.java][ReqController.java]{
-@RequestMapping(value = "/getParam")
-public String getParam(@RequestParam String foo, @RequestParam String bar,
-        Model model) {
-    model.addAttribute("modelFoo", foo);
-    model.addAttribute("modelBar", bar);
-    return "req/getParam";
-}
+package com.example.spring.controller.c005;
 
-@RequestMapping(value = "/getParam2")
-public String getparam2(@RequestParam("foo1") String foo,
-        @RequestParam("bar1") String bar, Model model) {
-    model.addAttribute("modelFoo", foo);
-    model.addAttribute("modelBar", bar);
-    return "req/getParam";
-}
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-@RequestMapping("/getParam3")
-public String getParam3(@RequestParam(required = false) String foo,
-        @RequestParam(defaultValue = "default") String bar, Model model) {
-    model.addAttribute("foo", foo);
-    model.addAttribute("bar", bar);
-    return "req/getParam";
+@Controller
+@RequestMapping("/c005")
+public class C005Controller {
+    @RequestMapping(value = "/getParam")
+    public String getParam(@RequestParam String foo, @RequestParam String bar,
+            Model model) {
+        model.addAttribute("modelFoo", foo);
+        model.addAttribute("modelBar", bar);
+        return "c005/getParam";
+    }
+
+    @RequestMapping(value = "/getParam2")
+    public String getparam2(@RequestParam("foo1") String foo,
+            @RequestParam("bar1") String bar, Model model) {
+        model.addAttribute("modelFoo", foo);
+        model.addAttribute("modelBar", bar);
+        return "c005/getParam";
+    }
+
+    @RequestMapping("/getParam3")
+    public String getParam3(@RequestParam(required = false) String foo,
+            @RequestParam(defaultValue = "default") String bar, Model model) {
+        model.addAttribute("foo", foo);
+        model.addAttribute("bar", bar);
+        return "c005/getParam";
+    }
 }
 //}
 
@@ -63,56 +74,89 @@ modelBarの値は <c:out value="${modelBar}" />
 </html>
 //}
 
-テストは以下のとおりです。
+確認用のテストケースは次のとおりです。
 
 //list[request_get-ReqControllerTest.java][ReqControllerTest.java]{
-@Test
-public void getParam_foo$abc_bar$123のGET() throws Exception {
-    mockMvc.perform(get("/getParam?foo=abc&bar=123"))
-            .andExpect(status().isOk())
-            .andExpect(view().name("req/getParam"))
-            .andExpect(model().hasNoErrors())
-            .andExpect(model().attribute("modelFoo", is("abc")))
-            .andExpect(model().attribute("modelBar", is("123")))
-            .andExpect(request().attribute("foo", is(nullValue())))
-            .andExpect(request().attribute("bar", is(nullValue())));
-}
+package com.example.spring.controller.c005;
 
-@Test
-public void getParam_foo$abcのGET_パラメータ不足によるエラー() throws Exception {
-    mockMvc.perform(get("/getParam?foo=abc")).andExpect(
-            status().isBadRequest());
-}
+import static org.hamcrest.CoreMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
-@Test
-public void getParam2_foo1$abc_bar1$123のGET() throws Exception {
-    mockMvc.perform(get("/getParam2?foo1=abc&bar1=123"))
-            .andExpect(status().isOk())
-            .andExpect(view().name("req/getParam"))
-            .andExpect(model().hasNoErrors())
-            .andExpect(model().attribute("modelFoo", is("abc")))
-            .andExpect(model().attribute("modelBar", is("123")))
-            .andExpect(request().attribute("foo1", is(nullValue())))
-            .andExpect(request().attribute("bar1", is(nullValue())));
-}
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
 
-@Test
-public void getParam3_foo$abc_bar$123のGET() throws Exception {
-    mockMvc.perform(get("/getParam3?foo=abc&bar=123"))
-            .andExpect(status().isOk())
-            .andExpect(view().name("req/getParam"))
-            .andExpect(model().hasNoErrors())
-            .andExpect(model().attribute("foo", is("abc")))
-            .andExpect(model().attribute("bar", is("123")));
-}
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C005ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
 
-@Test
-public void getParam3のGET() throws Exception {
-    mockMvc.perform(get("/getParam3")).andExpect(status().isOk())
-            .andExpect(view().name("req/getParam"))
-            .andExpect(model().hasNoErrors())
-            .andExpect(model().attribute("foo", is(nullValue())))
-            .andExpect(model().attribute("bar", is("default")));
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void getParam_foo$abc_bar$123のGET() throws Exception {
+        mockMvc.perform(get("/getParam?foo=abc&bar=123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("req/getParam"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("modelFoo", is("abc")))
+                .andExpect(model().attribute("modelBar", is("123")))
+                .andExpect(request().attribute("foo", is(nullValue())))
+                .andExpect(request().attribute("bar", is(nullValue())));
+    }
+
+    @Test
+    public void getParam_foo$abcのGET_パラメータ不足によるエラー() throws Exception {
+        mockMvc.perform(get("/getParam?foo=abc")).andExpect(
+                status().isBadRequest());
+    }
+
+    @Test
+    public void getParam2_foo1$abc_bar1$123のGET() throws Exception {
+        mockMvc.perform(get("/getParam2?foo1=abc&bar1=123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("req/getParam"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("modelFoo", is("abc")))
+                .andExpect(model().attribute("modelBar", is("123")))
+                .andExpect(request().attribute("foo1", is(nullValue())))
+                .andExpect(request().attribute("bar1", is(nullValue())));
+    }
+
+    @Test
+    public void getParam3_foo$abc_bar$123のGET() throws Exception {
+        mockMvc.perform(get("/getParam3?foo=abc&bar=123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("req/getParam"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("foo", is("abc")))
+                .andExpect(model().attribute("bar", is("123")));
+    }
+
+    @Test
+    public void getParam3のGET() throws Exception {
+        mockMvc.perform(get("/getParam3")).andExpect(status().isOk())
+                .andExpect(view().name("req/getParam"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().attribute("foo", is(nullValue())))
+                .andExpect(model().attribute("bar", is("default")));
+    }
 }
 //}
 
