@@ -7,7 +7,7 @@ Spring MVCは依存ライブラリーが多く、Mavenを使わない場合に�
 
 == 基本の形
 
-==={web_xml} web.xmlに記述する
+==={001} web.xmlに記述する
 
 @<b>{タグ【001】}
 
@@ -339,7 +339,7 @@ public class C001ControllerTest {
 }
 //}
 
-==={java_config} Javaで設定する
+==={002} Javaで設定する
 
 @<b>{タグ【002】}
 
