@@ -1014,15 +1014,15 @@ public class C010ControllerTest {
 
 == ファイルのアップロード
 
-==={request_upload} Servlet 3.0によるファイルのアップロード
+==={025} Servlet 3.0によるファイルのアップロード
 
 @<b>{タグ【025】}
 
-Java EE 6、Servlet 3.0から標準でファイルのアップロードができるようになりました。ここではSpringで標準のファイルアップロードを行います。
+Java EE 6、Servlet 3.0から標準でファイルのアップロードができるようになりました。今回はServlet 3.0のファイルアップロードを行います。
 
 ファイルアップロードする場合には、web.xmlにアップロードの設定が必要です（もしくはServletのアノテーション）。web.xmlのDispatcherServletの設定を以下のようにします。
 
-//list[request_upload-web.xml][web.xml]{
+//[025-web.xml][web.xml]{
 <servlet>
  <servlet-name>dispatcher</servlet-name>
  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -1042,7 +1042,7 @@ Java EE 6、Servlet 3.0から標準でファイルのアップロードができ
 
 また、Springの設定も必要になります。
 
-//list[request_upload-spring-context.xml][spring-context.xml]{
+//list[025-spring-context.xml][spring-context.xml]{
 <bean id="multipartResolver"
  class="org.springframework.web.multipart.support.StandardServletMultipartResolver">
 </bean>
@@ -1050,26 +1050,46 @@ Java EE 6、Servlet 3.0から標準でファイルのアップロードができ
 
 Controllerは以下のようにします。受け取る際には、@<code>{@RequestParam}アノテーションを付けた引数で受け取ります。
 
-//list[request_upload-ReqController.java][ReqController.java]{
-@RequestMapping("uploadForm")
-public String uploadForm() {
-    return "req/uploadForm";
-}
+//list[025-C025Controller.java][C025Controller.java]{
+package com.example.spring.controller.c025;
 
-@RequestMapping(value = "/uploadRecv", method = RequestMethod.POST)
-public String uploadRecv(@RequestParam String test,
-        @RequestParam MultipartFile file, Model model) {
-    model.addAttribute("test", test);
-    model.addAttribute("fileName", file.getOriginalFilename());
-    return "req/uploadRecv";
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+@Controller
+@RequestMapping("/c025")
+public class C025Controller {
+    @RequestMapping("/uploadForm")
+    public String uploadForm() {
+        return "c025/uploadForm";
+    }
+
+    @RequestMapping(value = "/uploadRecv", method = RequestMethod.POST)
+    public String uploadRecv(@RequestParam String test,
+            @RequestParam MultipartFile file, Model model) throws IOException {
+        model.addAttribute("test", test);
+        Path path = Paths.get(System.getProperty("java.io.tmpdir"),
+                file.getOriginalFilename());
+        file.transferTo(path.toFile());
+        model.addAttribute("fileName", path);
+
+        return "c025/uploadRecv";
+    }
 }
 //}
 
-今回はファイルは保管せず、testパラメータとファイル名をmodelに格納します。
-
+今回はファイルを一時領域に保管し、そのファイルのパスをtestパラメータと一緒にmodelに格納します。
 ファイルを送信するuploadForm.jspです。
 
-//list[request_upload-uploadForm.jsp][uploadForm.jsp]{
+//list[025-uploadForm.jsp][uploadForm.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -1089,7 +1109,7 @@ public String uploadRecv(@RequestParam String test,
 
 結果表示のuploadRecv.jspです。日本語ファイル名も問題なく表示できます。
 
-//list[request_upload-uploadRecv.jsp][uploadRecv.jsp]{
+//list[025-uploadRecv.jsp][uploadRecv.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -1103,6 +1123,88 @@ public String uploadRecv(@RequestParam String test,
 送信されたtestパラメータは<c:out value="${test}" />
  </body>
 </html>
+//}
+
+確認用のテストケースは次のとおりです。
+
+//list[025-C025ControllerTest.java][C025ControllerTest.java]{
+package com.example.spring.controller.c025;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C025ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void uploadFormのGET() throws Exception {
+        mockMvc.perform(get("/c025/uploadForm")).andExpect(status().isOk())
+                .andExpect(view().name("c025/uploadForm"));
+    }
+
+    @Test
+    public void uploadRecvのPOST() throws Exception {
+        byte[] fileImage = null;
+        Path path = Paths.get("src/test/resources/c025/kappa.png");
+        if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+            fileImage = Files.readAllBytes(path);
+        }
+
+        // ローカルのファイル名もエミュレーションできる。
+        String fileName = "画像.png";
+        MockMultipartFile file = new MockMultipartFile("file", fileName, null,
+                fileImage);
+        // アップロードされるファイルのパス
+        Path actualFile = Paths.get(System.getProperty("java.io.tmpdir"),
+                "画像.png");
+
+        mockMvc.perform(
+                fileUpload("/c025/uploadRecv").file(file).param("test",
+                        "testParam")).andExpect(status().isOk())
+                .andExpect(view().name("c025/uploadRecv"))
+                .andExpect(model().attribute("test", is("testParam")))
+                .andExpect(model().attribute("fileName", actualFile));
+
+        // 画像が保管されていることを確認する
+        assertThat(Files.exists(actualFile, LinkOption.NOFOLLOW_LINKS),
+                is(true));
+        byte[] actualImage = Files.readAllBytes(actualFile);
+        assertThat(actualImage, is(equalTo(fileImage)));
+        // アップロードされたファイルの削除
+        Files.delete(actualFile);
+    }
+}
 //}
 
 ==={request_upload_exception} ファイルのアップロードの例外処理
