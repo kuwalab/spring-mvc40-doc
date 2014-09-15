@@ -1022,7 +1022,7 @@ Java EE 6、Servlet 3.0から標準でファイルのアップロードができ
 
 ファイルアップロードする場合には、web.xmlにアップロードの設定が必要です（もしくはServletのアノテーション）。web.xmlのDispatcherServletの設定を以下のようにします。
 
-//[025-web.xml][web.xml]{
+//list[025-web.xml][web.xml]{
 <servlet>
  <servlet-name>dispatcher</servlet-name>
  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -1207,13 +1207,15 @@ public class C025ControllerTest {
 }
 //}
 
-==={request_upload_exception} ファイルのアップロードの例外処理
+==={026_exception} ファイルのアップロードの例外処理
+
+@<b>{タグ【026】}
 
 ファイルアップロードでどれだけ大きなファイルをアップロードできるわけではなく、ある程度のサイズで制限させないとサーバーのリソースを食いつぶしてしまいます。
 
 前回設定したように、web.xmlでファイルのサイズは制限できます。
 
-//list[request_upload_exception-web.xml][web.xml]{
+//list[026-web.xml][web.xml]{
 <multipart-config>
  <location>/tmp</location>
  <max-file-size>1000000</max-file-size>
@@ -1224,8 +1226,8 @@ public class C025ControllerTest {
 
 このサイズを超えた時、SpringではMultipartExceptionが発生します。この例外はController側では補足できず、フレームワーク全体の例外処理で、キャッチする必要があります。
 
-//list[request_upload_exception-GlobalExceptionResolver.java][GlobalExceptionResolver.java]{
-package com.example.spring;
+//list[026-GlobalExceptionResolver.java][GlobalExceptionResolver.java]{
+package com.example.spring.controller.c026;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -1237,17 +1239,16 @@ public class GlobalExceptionResolver implements HandlerExceptionResolver {
     @Override
     public ModelAndView resolveException(HttpServletRequest request,
             HttpServletResponse response, Object handler, Exception e) {
-        System.out.println(e);
         ModelAndView mav = new ModelAndView();
         mav.addObject("errorMessage", "ファイルサイズが大きすぎます。");
-        mav.setViewName("req/uploadForm");
+        mav.setViewName("c026/uploadForm");
         return mav;
     }
 }
 //}
 
-//list[request_upload_exception-spring-context.xml][spring-context.xml]{
-<bean class="com.example.spring.GlobalExceptionResolver"/>
+//list[026-spring-context.xml][spring-context.xml]{
+<bean class="com.example.spring.controller.c026.GlobalExceptionResolver"/>
 //}
 
 == いろいろなスコープ
