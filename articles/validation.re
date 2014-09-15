@@ -2,39 +2,49 @@
 
 == 型チェック
 
-==={type_check} 受け取る型のチェック
+==={011} 受け取る型のチェック
 
 @<b>{タグ【011】}
 
-今までパラメータはすべてStringで受けていたので、型変換のエラー等は発生していませんでした。今回は、String型以外の型でパラメータを受け取りどのような動作になるかを確認していきます。
+ここまではパラメータはすべてStringで受けていたので、型変換のエラー等は発生していませんでした。ここでは、String型以外の型でパラメータを受け取りどのような動作になるかを確認していきます。
 
 最初にパラメータを受けつ取るクラスを作成します。price変数をIntegerにしておきどのように動作するのかを確認します。
 
-//list[type_check-Book.java][Book.java]{
-package com.example.spring.controller;
+//list[011-C011Model.java][C011Model.java]{
+package com.example.spring.controller.c011;
 
-public class Book {
+public class C011Model {
     private String name;
     private Integer price;
-    // getter setterは省略
+
+    // setter、getterは省略
 }
 //}
 
-Controllerクラスです。ModelAttriubteでBookのパラメータを受け取ります。また、Bookへのパラメータの割り当ての際のエラーを取得するため、Bookの次の引数にBindingResultクラスを指定します。BIndingResultクラスは、バインドされるクラスの次の引数にないといけません。
+Controllerクラスです。ModelAttriubteでC011Modelのパラメータを受け取ります。また、C011Modelへのパラメータの割り当ての際のエラーを取得するため、C011の次の引数にBindingResultクラスを指定します。BIndingResultクラスは、バインドされるクラスの次の引数にないといけません。
 
-//list[type_check-CheckController.java][CheckController.java]{
+//list[011-C011Controller.java][C001Controller.java]{
+package com.example.spring.controller.c011;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 @Controller
-public class CheckController {
+@RequestMapping("/c011")
+public class C011Controller {
     @RequestMapping("/checkType")
-    public String checkType(@ModelAttribute Book book, BindingResult errors) {
-        return "check/checkType";
-     }
+    public String checkType(@ModelAttribute C011Model c011Model,
+            BindingResult errors) {
+        return "c011/checkType";
+    }
 }
 //}
 
 最後に表示用のJSPです。
 
-//list[check_type-checkType.jsp][checkType.jsp]{
+//list[011-checkType.jsp][checkType.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -43,30 +53,28 @@ public class CheckController {
   <title>サンプル</title>
  </head>
  <body>
- バインディングエラー <form:errors path="book.*" /><br>
-book.nameの値は <c:out value="${book.name}" /><br>
-book.priceの値は <c:out value="${book.price}" /><br>
+ バインディングエラー <form:errors path="c011Model.*" /><br>
+c011Model.nameの値は <c:out value="${c011Model.name}" /><br>
+c011Model.priceの値は <c:out value="${c011Model.price}" /><br>
  </body>
 </html>
 //}
 
-このプログラムで「/checkType?name=書籍&price=文字列」というリクエストを投げると以下の様な出力になります。
+このプログラムで「/c011/checkType?name=書籍&price=文字列」というリクエストを投げると次の様な出力になります。
 
 //cmd{
-バインディングエラー Failed to convert property value of type java.lang.String to required
-    type java.lang.Integer for property price; nested exception is 
-    java.lang.NumberFormatException: For input string: "文字列"
-book.nameの値は 書籍
+バインディングエラー Failed to convert property value of type java.lang.String to required type java.lang.Integer for property price; nested exception is java.lang.NumberFormatException: For input string: "文字列"
+book.nameの値は 
 book.priceの値は 
 //}
 
-book.priceには文字列のためバインディングができずnullが入っています。また、バインディング失敗のデフォルトのエラーメッセージが表示されます。
+c011Model.priceには文字列のためバインディングができずnullが入っています。また、バインディング失敗のデフォルトのエラーメッセージが表示されます。
 
 このままだと、非常にわかりにくいのでデフォルトのエラーメッセージを変更します。
 
 まず、spring-context.xmlにメッセージソースの設定を追加します。
 
-//list[type_check-spring-context.xml][spring-context.xml]{
+//list[011-spring-context.xml][spring-context.xml]{
 <bean id="messageSource"
  class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
  <property name="basename" value="classpath:/messages" />
@@ -75,7 +83,7 @@ book.priceには文字列のためバインディングができずnullが入っ
 
 そして、指定した名前+「.properties」ファイルを作成します。今回は型変換のエラーのメッセージだけを記載します。
 
-//list[type_check-messages.properties][messages.properties]{
+//list[011-messages.properties][messages.properties]{
 typeMismatch.java.lang.Integer=整数で入力してください。
 //}
 
@@ -93,7 +101,7 @@ typeMismatch.java.lang.Integer=整数で入力してください。
 
 ここで、メッセージを以下のように変更します。
 
-//list[type_check-message.properties2][message.properties]{
+//list[011-message.properties2][message.properties]{
 typeMismatch.java.lang.Integer={0}は整数で入力してください。
 //}
 
@@ -107,7 +115,7 @@ priceは整数で入力してください。
 
 メッセージソースに、フィールド名の値をキーとして登録します。
 
-//list[type_check-message.properties3][message.propeties]{
+//list[011-message.properties3][message.propeties]{
 price=価格
 //}
 
@@ -117,10 +125,10 @@ price=価格
 価格は整数で入力してください。
 //}
 
-テストケースは以下のとおり。
+確認用のテストケースは次のとおりです。
 
-//list[type_check-CheckControllerTest.java][TestControllerTest.java]{
-package com.example.spring.controller;
+//list[011-C011ControllerTest.java][C011ControllerTest.java]{
+package com.example.spring.controller.c011;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -148,8 +156,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
-public class CheckControllerTest {
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C011ControllerTest {
     @Autowired
     private WebApplicationContext wac;
 
@@ -163,43 +172,44 @@ public class CheckControllerTest {
     @Test
     public void checkTypeへのGET_priceが1000() throws Exception {
         MvcResult mvcResult = mockMvc
-                .perform(get("/checkType").param("price", "1000"))
+                .perform(get("/c011/checkType").param("price", "1000"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("check/checkType"))
+                .andExpect(view().name("c011/checkType"))
                 .andExpect(model().hasNoErrors())
-                .andExpect(model().attributeExists("book")).andReturn();
+                .andExpect(model().attributeExists("c011Model")).andReturn();
 
         Map<String, Object> model = mvcResult.getModelAndView().getModel();
-        Object bookObject = model.get("book");
-        assertThat(bookObject, is(notNullValue()));
-        assertThat(bookObject, is(instanceOf(Book.class)));
-        Book book = (Book) bookObject;
-        assertThat(book.getPrice(), is(1000));
+        Object c011ModelObject = model.get("c011Model");
+        assertThat(c011ModelObject, is(notNullValue()));
+        assertThat(c011ModelObject, is(instanceOf(C011Model.class)));
+        C011Model c011Model = (C011Model) c011ModelObject;
+        assertThat(c011Model.getPrice(), is(1000));
     }
 
     @Test
     public void checkTypeへのGET_priceがabc() throws Exception {
         MvcResult mvcResult = mockMvc
-                .perform(get("/checkType").param("price", "abc"))
+                .perform(get("/c011/checkType").param("price", "abc"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("check/checkType"))
+                .andExpect(view().name("c011/checkType"))
                 .andExpect(model().hasErrors())
                 .andExpect(model().errorCount(1))
-                .andExpect(model().attributeHasFieldErrors("book", "price"))
-                .andExpect(model().attributeExists("book")).andReturn();
+                .andExpect(
+                        model().attributeHasFieldErrors("c011Model", "price"))
+                .andExpect(model().attributeExists("c011Model")).andReturn();
 
         // パラメータのチェック
         ModelAndView mav = mvcResult.getModelAndView();
         Map<String, Object> model = mav.getModel();
-        Object bookObject = model.get("book");
-        assertThat(bookObject, is(notNullValue()));
-        assertThat(bookObject, is(instanceOf(Book.class)));
-        Book book = (Book) bookObject;
-        assertThat(book.getPrice(), is(nullValue()));
+        Object c011ModelObject = model.get("c011Model");
+        assertThat(c011ModelObject, is(notNullValue()));
+        assertThat(c011ModelObject, is(instanceOf(C011Model.class)));
+        C011Model c011Model = (C011Model) c011ModelObject;
+        assertThat(c011Model.getPrice(), is(nullValue()));
 
         // エラーメッセージのチェック
         Object object = mav.getModel().get(
-                "org.springframework.validation.BindingResult.book");
+                "org.springframework.validation.BindingResult.c011Model");
         assertThat(object, is(not(nullValue())));
         assertThat(object, is(instanceOf(BindingResult.class)));
         BindingResult bindingResult = (BindingResult) object;
@@ -228,13 +238,14 @@ Validationでエラーの場合には、エラーメッセージがModelに登�
 
 //emlist{
 MvcResult mvcResult = mockMvc
-        .perform(get("/checkType").param("price", "abc"))
+        .perform(get("/c011/checkType").param("price", "abc"))
         .andExpect(status().isOk())
-        .andExpect(view().name("check/checkType"))
+        .andExpect(view().name("c011/checkType"))
         .andExpect(model().hasErrors())
         .andExpect(model().errorCount(1))
-        .andExpect(model().attributeHasFieldErrors("book", "price"))
-        .andExpect(model().attributeExists("book")).andReturn();
+        .andExpect(
+                model().attributeHasFieldErrors("c011Model", "price"))
+        .andExpect(model().attributeExists("c011Model")).andReturn();
 //}
 
 Validationで発生したエラーメッセージは、以下のルールでModelに格納されます。
@@ -246,17 +257,17 @@ Validationで発生したエラーメッセージは、以下のルールでMode
 ここでは、bookモデルが対象のため、次のようになります。
 
 //emlist{
-"org.springframework.validation.BindingResult.book"
+"org.springframework.validation.BindingResult.c011Model"
 //}
 
 Modelには、この属性名でBindingResultのインスタンスが格納されています。そのため、この属性は以下のように取り出し、確認することができます。
 
 //emlist{
 Object object = mav.getModel().get(
-        "org.springframework.validation.BindingResult.book");
+        "org.springframework.validation.BindingResult.c011Model");
 assertThat(object, is(not(nullValue())));
 assertThat(object, is(instanceOf(BindingResult.class)));
-BindingResult bindingResult = (BindingResult) object
+BindingResult bindingResult = (BindingResult) object;
 //}
 
 BindingResultからはエラーメッセージのコードを取得することができます。BindingResultからフィールドごとのエラーは、getFieldErrorsメソッドで取り出せます。
@@ -272,6 +283,7 @@ getFieldErrorsはFieldErrorクラスのListを取得できます。そこから�
 //emlist{
 FieldError fieldError = list.get(0);
 assertThat(fieldError.getCode(), is("typeMismatch"));
+
 Object[] args = fieldError.getArguments();
 assertThat(args.length, is(1));
 assertThat(args[0],
