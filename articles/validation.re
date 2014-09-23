@@ -671,28 +671,117 @@ public class C012ControllerTest {
 }
 //}
 
-==={validation_decimal} ValidatorでDecimalのチェック
+==={013} ValidatorでDecimalのチェック
 
 @<b>{タグ【013】}
 
-今回からしばらくBean Validationの標準のValidatorの説明をしていきます。最初はDecimalMax、DecimalMinの2つです。
+ここからしばらくBean Validationの標準のValidatorの説明をしていきます。最初はDecimalMax、DecimalMinの2つです。
 
 DecimalMaxとDecimalMinはその名の通り、数値の最大と最小をチェックします。また、inclusive属性をtrue/falseにすることで、値自体を含む、含まないかを選択できます。
 
-Bookのpriceフィールドに値を設定します。以下の例だと1〜100000未満だけ入力が許されます。
+最初にvalidatorを動作させるためのControllerとJSPを作成します。ControllerとJSPは先の例と同様のため、説明は省略します。
 
-//list[validation_decimal-Book.java][Book.java]{
-@NotNull
-private String name;
-@NotNull
-@DecimalMin("1")
-@DecimalMax(value = "100000", inclusive = false)
-private Integer price;
+//list[013-C013Controller.java][C013Controller.java]{
+package com.example.spring.controller.c013;
+
+import javax.validation.Valid;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/c013")
+public class C013Controller {
+    @RequestMapping("/bookForm")
+    public String bookForm() {
+        return "c013/bookForm";
+    }
+
+    @RequestMapping(value = "/bookRecv", method = RequestMethod.POST)
+    public String bookRecv(@Valid @ModelAttribute C013Model c013Model,
+            BindingResult errors) {
+        if (errors.hasErrors()) {
+            return "c013/bookForm";
+        }
+        return "c013/bookRecv";
+    }
+}
+//}
+
+//list[013-bookForm.jsp][bookForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="bookRecv" method="post">
+   書名: <input type="text" name="name" size="20"><form:errors path="c013Model.name" /><br>
+   価格: <input type="text" name="price" size="20"><form:errors path="c013Model.price" /><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+//list[013-bookRecv.jsp][bookRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+c013Model.nameの値は <c:out value="${c013Model.name}" /><br>
+c013Model.priceの値は <c:out value="${c013Model.price}" /><br>
+ </body>
+</html>
+//}
+
+C013Model1のpriceフィールドにValidationを設定します。以下の例だと1〜100000未満だけ入力が許されます。
+
+//list[013-C013Model.java][C013Model.java]{
+package com.example.spring.controller.c013;
+
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
+
+public class C013Model {
+    @NotNull
+    private String name;
+    @NotNull
+    @DecimalMin("1")
+    @DecimalMax(value = "100000", inclusive = false)
+    private Integer price;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+}
 //}
 
 DecimalMaxとDecimalMinのメッセージを用意します。
 
-//list[validation_decimal-messages.properties][messages.properties]{
+//list[013-messages.properties][messages.properties]{
 javax.validation.constraints.DecimalMax.message = {0}は{value}${inclusive == true ? '以下の' : 'より小さい'}数を入力してください
 javax.validation.constraints.DecimalMin.message = {0}は{value}${inclusive == true ? '以上の' : 'より大きい'}数を入力してください
 //}
@@ -701,7 +790,7 @@ javax.validation.constraints.DecimalMin.message = {0}は{value}${inclusive == tr
 
 テストの実行のために、pom.xmlに以下を追加する必要があります。
 
-//list[validation_decimal-pom.xml][pom.xml]{
+//list[013-pom.xml][pom.xml]{
 <dependency>
  <groupId>org.glassfish.web</groupId>
  <artifactId>el-impl</artifactId>
@@ -712,117 +801,163 @@ javax.validation.constraints.DecimalMin.message = {0}は{value}${inclusive == tr
 
 テストケースは以下のとおり。
 
-//list[validation_decimal-CheckControllerTest.java][CheckControllerTest.java]{
-@Test
-public void bookRecvへのPOST_priceが1() throws Exception {
-    MvcResult mvcResult = mockMvc
-            .perform(
-                    post("/bookRecv").param("name", "よく分かるSpring").param(
-                            "price", "1")).andExpect(status().isOk())
-            .andExpect(view().name("check/bookForm"))
-            .andExpect(model().hasErrors())
-            .andExpect(model().errorCount(0))
-            .andExpect(model().attributeExists("book")).andReturn();
+//list[013-C013ControllerTest.java][C013ControllerControllerTest.java]{
+package com.example.spring.controller.c013;
 
-    // パラメータのチェック
-    ModelAndView mav = mvcResult.getModelAndView();
-    Map<String, Object> model = mav.getModel();
-    Object bookObject = model.get("book");
-    assertThat(bookObject, is(notNullValue()));
-    assertThat(bookObject, is(instanceOf(Book.class)));
-    Book book = (Book) bookObject;
-    assertThat(book.getName(), is("よく分かるSpring"));
-    assertThat(book.getPrice(), is(1));
-}
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
-@Test
-public void bookRecvへのPOST_priceが0() throws Exception {
-    MvcResult mvcResult = mockMvc
-            .perform(
-                    post("/bookRecv").param("name", "よく分かるSpring").param(
-                            "price", "0")).andExpect(status().isOk())
-            .andExpect(view().name("check/bookForm"))
-            .andExpect(model().hasErrors())
-            .andExpect(model().errorCount(1))
-            .andExpect(model().attributeHasFieldErrors("book", "price"))
-            .andExpect(model().attributeExists("book")).andReturn();
+import java.util.List;
+import java.util.Map;
 
-    // パラメータのチェック
-    ModelAndView mav = mvcResult.getModelAndView();
-    Map<String, Object> model = mav.getModel();
-    Object bookObject = model.get("book");
-    assertThat(bookObject, is(notNullValue()));
-    assertThat(bookObject, is(instanceOf(Book.class)));
-    Book book = (Book) bookObject;
-    assertThat(book.getName(), is("よく分かるSpring"));
-    assertThat(book.getPrice(), is(0));
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
 
-    // エラーメッセージのチェック
-    Object object = mav.getModel().get(
-            "org.springframework.validation.BindingResult.book");
-    assertThat(object, is(not(nullValue())));
-    assertThat(object, is(instanceOf(BindingResult.class)));
-    BindingResult bindingResult = (BindingResult) object;
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C013ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
 
-    checkDecimalField(bindingResult, "price", "DecimalMin", true, "1");
-}
+    private MockMvc mockMvc;
 
-@Test
-public void bookRecvへのPOST_priceが100001() throws Exception {
-    MvcResult mvcResult = mockMvc
-            .perform(
-                    post("/bookRecv").param("name", "よく分かるSpring").param(
-                            "price", "100001")).andExpect(status().isOk())
-            .andExpect(view().name("check/bookForm"))
-            .andExpect(model().hasErrors())
-            .andExpect(model().errorCount(1))
-            .andExpect(model().attributeHasFieldErrors("book", "price"))
-            .andExpect(model().attributeExists("book")).andReturn();
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
 
-    // パラメータのチェック
-    ModelAndView mav = mvcResult.getModelAndView();
-    Map<String, Object> model = mav.getModel();
-    Object bookObject = model.get("book");
-    assertThat(bookObject, is(notNullValue()));
-    assertThat(bookObject, is(instanceOf(Book.class)));
-    Book book = (Book) bookObject;
-    assertThat(book.getName(), is("よく分かるSpring"));
-    assertThat(book.getPrice(), is(100001));
+    @Test
+    public void bookRecvへのPOST_priceが1() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c013/bookRecv").param("name", "よく分かるSpring")
+                                .param("price", "1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c013/bookRecv"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().errorCount(0))
+                .andExpect(model().attributeExists("c013Model")).andReturn();
 
-    // エラーメッセージのチェック
-    Object object = mav.getModel().get(
-            "org.springframework.validation.BindingResult.book");
-    assertThat(object, is(not(nullValue())));
-    assertThat(object, is(instanceOf(BindingResult.class)));
-    BindingResult bindingResult = (BindingResult) object;
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c013ModelObject = model.get("c013Model");
+        assertThat(c013ModelObject, is(notNullValue()));
+        assertThat(c013ModelObject, is(instanceOf(C013Model.class)));
+        C013Model c013Model = (C013Model) c013ModelObject;
+        assertThat(c013Model.getName(), is("よく分かるSpring"));
+        assertThat(c013Model.getPrice(), is(1));
+    }
 
-    checkDecimalField(bindingResult, "price", "DecimalMax", true, "1");
-}
+    @Test
+    public void bookRecvへのPOST_priceが0() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c013/bookRecv").param("name", "よく分かるSpring")
+                                .param("price", "0"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c013/bookForm"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(
+                        model().attributeHasFieldErrors("c013Model", "price"))
+                .andExpect(model().attributeExists("c013Model")).andReturn();
 
-private void checkDecimalField(BindingResult bindingResult,
-        String fieldName, String errorCode, boolean inclusive, String value) {
-    // エラーのあるフィールドの取得
-    List<FieldError> list = bindingResult.getFieldErrors(fieldName);
-    assertThat(list, is(not(nullValue())));
-    assertThat(list.size(), is(1));
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c013ModelObject = model.get("c013Model");
+        assertThat(c013ModelObject, is(notNullValue()));
+        assertThat(c013ModelObject, is(instanceOf(C013Model.class)));
+        C013Model c013Model = (C013Model) c013ModelObject;
+        assertThat(c013Model.getName(), is("よく分かるSpring"));
+        assertThat(c013Model.getPrice(), is(0));
 
-    // 詳細なエラーチェック
-    FieldError fieldError = list.get(0);
-    assertThat(fieldError.getCode(), is(errorCode));
+        // エラーメッセージのチェック
+        Object object = mav.getModel().get(
+                "org.springframework.validation.BindingResult.c013Model");
+        assertThat(object, is(not(nullValue())));
+        assertThat(object, is(instanceOf(BindingResult.class)));
+        BindingResult bindingResult = (BindingResult) object;
 
-    // エラーメッセージのパラメータ
-    Object[] args = fieldError.getArguments();
-    assertThat(args.length, is(3));
-    assertThat(args[0],
-            is(instanceOf(DefaultMessageSourceResolvable.class)));
-    DefaultMessageSourceResolvable dmr = (DefaultMessageSourceResolvable) args[0];
-    assertThat(dmr.getCode(), is(fieldName));
-    // inclusive
-    assertThat(args[1], is(instanceOf(Boolean.class)));
-    assertThat(args[1], is(inclusive));
-    // value
-    assertThat(args[2], is(instanceOf(String.class)));
-    assertThat(args[2], is(value));
+        checkDecimalField(bindingResult, "price", "DecimalMin", true, "1");
+    }
+
+    @Test
+    public void bookRecvへのPOST_priceが100000() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c013/bookRecv").param("name", "よく分かるSpring")
+                                .param("price", "100000"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c013/bookForm"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(
+                        model().attributeHasFieldErrors("c013Model", "price"))
+                .andExpect(model().attributeExists("c013Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c013ModelObject = model.get("c013Model");
+        assertThat(c013ModelObject, is(notNullValue()));
+        assertThat(c013ModelObject, is(instanceOf(C013Model.class)));
+        C013Model c013Model = (C013Model) c013ModelObject;
+        assertThat(c013Model.getName(), is("よく分かるSpring"));
+        assertThat(c013Model.getPrice(), is(100000));
+
+        // エラーメッセージのチェック
+        Object object = mav.getModel().get(
+                "org.springframework.validation.BindingResult.c013Model");
+        assertThat(object, is(not(nullValue())));
+        assertThat(object, is(instanceOf(BindingResult.class)));
+        BindingResult bindingResult = (BindingResult) object;
+
+        checkDecimalField(bindingResult, "price", "DecimalMax", false, "100000");
+    }
+
+    private void checkDecimalField(BindingResult bindingResult,
+            String fieldName, String errorCode, boolean inclusive, String value) {
+        // エラーのあるフィールドの取得
+        List<FieldError> list = bindingResult.getFieldErrors(fieldName);
+        assertThat(list, is(not(nullValue())));
+        assertThat(list.size(), is(1));
+
+        // 詳細なエラーチェック
+        FieldError fieldError = list.get(0);
+        assertThat(fieldError.getCode(), is(errorCode));
+
+        // エラーメッセージのパラメータ
+        Object[] args = fieldError.getArguments();
+        assertThat(args.length, is(3));
+        assertThat(args[0],
+                is(instanceOf(DefaultMessageSourceResolvable.class)));
+        DefaultMessageSourceResolvable dmr = (DefaultMessageSourceResolvable) args[0];
+        assertThat(dmr.getCode(), is(fieldName));
+
+        assertThat(args[1], is(instanceOf(Boolean.class)));
+        assertThat(args[1], is(inclusive));
+
+        assertThat(args[2], is(instanceOf(String.class)));
+        assertThat(args[2], is(value));
+    }
 }
 //}
 
