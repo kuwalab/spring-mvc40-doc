@@ -961,140 +961,276 @@ public class C013ControllerTest {
 }
 //}
 
-==={validation_min_max} ValidatorでMin、Maxのチェック
+==={014} ValidatorでMin、Maxのチェック
 
 @<b>{タグ【014】}
 
 今回はBean ValidationのMin、Maxの2つです。
 
-MinとMaxはDecimalMax、DecimalMinと違い、整数のみのチェックとなります。またその数値自身を含むチェックのみが可能です。valueも数値で指定できるので、整数のチェックの場合はこちらのほうがいいかもしれません。
+MinとMaxはDecimalMax、DecimalMinと違い、整数のみのチェックとなります。またその数値自身を含むチェックのみが可能です。valueも数値で指定できるので、整数のチェックの場合はこちらのほうがいいです。
 
-//list[validation_min_max-Book.java][Book.java]{
-@NotNull
-private String name;
-@NotNull
-@Min(1)
-@Max(100000)
-private Integer price;
+最初にこれまでと同様の、ControllerとJSPを作成します。ControllerとJSPは先の例と同様のため、説明は省略します。
+
+//list[014-C014Controller.java][C014Controller.java]{
+package com.example.spring.controller.c014;
+
+import javax.validation.Valid;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/c014")
+public class C014Controller {
+    @RequestMapping("/bookForm")
+    public String bookForm() {
+        return "c014/bookForm";
+    }
+
+    @RequestMapping(value = "/bookRecv", method = RequestMethod.POST)
+    public String bookRecv(@Valid @ModelAttribute C014Model c013Model,
+            BindingResult errors) {
+        if (errors.hasErrors()) {
+            return "c014/bookForm";
+        }
+        return "c014/bookRecv";
+    }
+}
+//}
+
+//list[014-bookForm.jsp][bookForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="bookRecv" method="post">
+   書名: <input type="text" name="name" size="20"><form:errors path="c014Model.name" /><br>
+   価格: <input type="text" name="price" size="20"><form:errors path="c014Model.price" /><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+//list[014-bookRecv.jsp][bookRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+c014Model.nameの値は <c:out value="${c014Model.name}" /><br>
+c014Model.priceの値は <c:out value="${c014Model.price}" /><br>
+ </body>
+</html>
+//}
+
+C014ModelのpriceフィールドにValidationを設定します。以下の例だと1〜100000だけ入力が許されます。
+//list[014-C014Model.java][C014Model.java]{
+package com.example.spring.controller.c014;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+public class C014Model {
+    @NotNull
+    private String name;
+    @NotNull
+    @Min(1)
+    @Max(100000)
+    private Integer price;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+}
 //}
 
 メッセージは以下のように記述します。
 
-//list[validation_min_max-messages.properties][messages.properteis]{
+//list[014-messages.properties][messages.properteis]{
 javax.validation.constraints.Max.message = {0}は{value}以下の数を入力してください
 javax.validation.constraints.Min.message = {0}は{value}以上の数を入力してください
 //}
 
-テストケースは以下のとおり。
+確認用のテストケースは次のとおりです。
 
-//list[validation_min_max-CheckControllerTest.java][CheckControllerTest.java]{
-@Test
-public void bookRecvへのPOST_priceが1_MinMax() throws Exception {
-    MvcResult mvcResult = mockMvc
-            .perform(
-                    post("/bookRecv").param("name", "よく分かるSpring").param(
-                            "price", "1")).andExpect(status().isOk())
-            .andExpect(view().name("check/bookRecv"))
-            .andExpect(model().hasNoErrors())
-            .andExpect(model().errorCount(0))
-            .andExpect(model().attributeExists("book")).andReturn();
+//list[014-C014ControllerTest.java][C014ControllerTest.java]{
+package com.example.spring.controller.c014;
 
-    // パラメータのチェック
-    ModelAndView mav = mvcResult.getModelAndView();
-    Map<String, Object> model = mav.getModel();
-    Object bookObject = model.get("book");
-    assertThat(bookObject, is(notNullValue()));
-    assertThat(bookObject, is(instanceOf(Book.class)));
-    Book book = (Book) bookObject;
-    assertThat(book.getName(), is("よく分かるSpring"));
-    assertThat(book.getPrice(), is(1));
-}
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
 
-@Test
-public void bookRecvへのPOST_priceが0_MinMax() throws Exception {
-    MvcResult mvcResult = mockMvc
-            .perform(
-                    post("/bookRecv").param("name", "よく分かるSpring").param(
-                            "price", "0")).andExpect(status().isOk())
-            .andExpect(view().name("check/bookForm"))
-            .andExpect(model().hasErrors())
-            .andExpect(model().errorCount(1))
-            .andExpect(model().attributeHasFieldErrors("book", "price"))
-            .andExpect(model().attributeExists("book")).andReturn();
+import java.util.List;
+import java.util.Map;
 
-    // パラメータのチェック
-    ModelAndView mav = mvcResult.getModelAndView();
-    Map<String, Object> model = mav.getModel();
-    Object bookObject = model.get("book");
-    assertThat(bookObject, is(notNullValue()));
-    assertThat(bookObject, is(instanceOf(Book.class)));
-    Book book = (Book) bookObject;
-    assertThat(book.getName(), is("よく分かるSpring"));
-    assertThat(book.getPrice(), is(0));
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
 
-    // エラーメッセージのチェック
-    Object object = mav.getModel().get(
-            "org.springframework.validation.BindingResult.book");
-    assertThat(object, is(not(nullValue())));
-    assertThat(object, is(instanceOf(BindingResult.class)));
-    BindingResult bindingResult = (BindingResult) object;
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C014ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
 
-    checkMinMaxField(bindingResult, "price", "Min", 1L);
-}
+    private MockMvc mockMvc;
 
-@Test
-public void bookRecvへのPOST_priceが1000001_MinMax() throws Exception {
-    MvcResult mvcResult = mockMvc
-            .perform(
-                    post("/bookRecv").param("name", "よく分かるSpring").param(
-                            "price", "100001")).andExpect(status().isOk())
-            .andExpect(view().name("check/bookForm"))
-            .andExpect(model().hasErrors())
-            .andExpect(model().errorCount(1))
-            .andExpect(model().attributeHasFieldErrors("book", "price"))
-            .andExpect(model().attributeExists("book")).andReturn();
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
 
-    // パラメータのチェック
-    ModelAndView mav = mvcResult.getModelAndView();
-    Map<String, Object> model = mav.getModel();
-    Object bookObject = model.get("book");
-    assertThat(bookObject, is(notNullValue()));
-    assertThat(bookObject, is(instanceOf(Book.class)));
-    Book book = (Book) bookObject;
-    assertThat(book.getName(), is("よく分かるSpring"));
-    assertThat(book.getPrice(), is(100001));
+    @Test
+    public void bookRecvへのPOST_priceが1() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c014/bookRecv").param("name", "よく分かるSpring")
+                                .param("price", "1"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c014/bookRecv"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().errorCount(0))
+                .andExpect(model().attributeExists("c014Model")).andReturn();
 
-    // エラーメッセージのチェック
-    Object object = mav.getModel().get(
-            "org.springframework.validation.BindingResult.book");
-    assertThat(object, is(not(nullValue())));
-    assertThat(object, is(instanceOf(BindingResult.class)));
-    BindingResult bindingResult = (BindingResult) object;
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c014ModelObject = model.get("c014Model");
+        assertThat(c014ModelObject, is(notNullValue()));
+        assertThat(c014ModelObject, is(instanceOf(C014Model.class)));
+        C014Model c014Model = (C014Model) c014ModelObject;
+        assertThat(c014Model.getName(), is("よく分かるSpring"));
+        assertThat(c014Model.getPrice(), is(1));
+    }
 
-    checkMinMaxField(bindingResult, "price", "Max", 100000L);
-}
+    @Test
+    public void bookRecvへのPOST_priceが0() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c014/bookRecv").param("name", "よく分かるSpring")
+                                .param("price", "0"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c014/bookForm"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(
+                        model().attributeHasFieldErrors("c014Model", "price"))
+                .andExpect(model().attributeExists("c014Model")).andReturn();
 
-private void checkMinMaxField(BindingResult bindingResult,
-        String fieldName, String errorCode, Long value) {
-    // エラーのあるフィールドの取得
-    List<FieldError> list = bindingResult.getFieldErrors(fieldName);
-    assertThat(list, is(not(nullValue())));
-    assertThat(list.size(), is(1));
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c014ModelObject = model.get("c014Model");
+        assertThat(c014ModelObject, is(notNullValue()));
+        assertThat(c014ModelObject, is(instanceOf(C014Model.class)));
+        C014Model c014Model = (C014Model) c014ModelObject;
+        assertThat(c014Model.getName(), is("よく分かるSpring"));
+        assertThat(c014Model.getPrice(), is(0));
 
-    // 詳細なエラーチェック
-    FieldError fieldError = list.get(0);
-    assertThat(fieldError.getCode(), is(errorCode));
+        // エラーメッセージのチェック
+        Object object = mav.getModel().get(
+                "org.springframework.validation.BindingResult.c014Model");
+        assertThat(object, is(not(nullValue())));
+        assertThat(object, is(instanceOf(BindingResult.class)));
+        BindingResult bindingResult = (BindingResult) object;
 
-    // エラーメッセージのパラメータ
-    Object[] args = fieldError.getArguments();
-    assertThat(args.length, is(2));
-    assertThat(args[0],
-            is(instanceOf(DefaultMessageSourceResolvable.class)));
-    DefaultMessageSourceResolvable dmr = (DefaultMessageSourceResolvable) args[0];
-    assertThat(dmr.getCode(), is(fieldName));
-    // value
-    assertThat(args[1], is(instanceOf(Long.class)));
-    assertThat(args[1], is(value));
+        checkMinMaxField(bindingResult, "price", "Min", 1L);
+    }
+
+    @Test
+    public void bookRecvへのPOST_priceが100000() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c014/bookRecv").param("name", "よく分かるSpring")
+                                .param("price", "100001"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c014/bookForm"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(
+                        model().attributeHasFieldErrors("c014Model", "price"))
+                .andExpect(model().attributeExists("c014Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c014ModelObject = model.get("c014Model");
+        assertThat(c014ModelObject, is(notNullValue()));
+        assertThat(c014ModelObject, is(instanceOf(C014Model.class)));
+        C014Model c014Model = (C014Model) c014ModelObject;
+        assertThat(c014Model.getName(), is("よく分かるSpring"));
+        assertThat(c014Model.getPrice(), is(100001));
+
+        // エラーメッセージのチェック
+        Object object = mav.getModel().get(
+                "org.springframework.validation.BindingResult.c014Model");
+        assertThat(object, is(not(nullValue())));
+        assertThat(object, is(instanceOf(BindingResult.class)));
+        BindingResult bindingResult = (BindingResult) object;
+
+        checkMinMaxField(bindingResult, "price", "Max", 100000L);
+    }
+
+    private void checkMinMaxField(BindingResult bindingResult,
+            String fieldName, String errorCode, Long value) {
+        // エラーのあるフィールドの取得
+        List<FieldError> list = bindingResult.getFieldErrors(fieldName);
+        assertThat(list, is(not(nullValue())));
+        assertThat(list.size(), is(1));
+
+        // 詳細なエラーチェック
+        FieldError fieldError = list.get(0);
+        assertThat(fieldError.getCode(), is(errorCode));
+
+        // エラーメッセージのパラメータ
+        Object[] args = fieldError.getArguments();
+        assertThat(args.length, is(2));
+        assertThat(args[0],
+                is(instanceOf(DefaultMessageSourceResolvable.class)));
+        DefaultMessageSourceResolvable dmr = (DefaultMessageSourceResolvable) args[0];
+        assertThat(dmr.getCode(), is(fieldName));
+        // value
+        assertThat(args[1], is(instanceOf(Long.class)));
+        assertThat(args[1], is(value));
+    }
 }
 //}
 
