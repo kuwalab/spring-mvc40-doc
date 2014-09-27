@@ -1234,7 +1234,7 @@ public class C014ControllerTest {
 }
 //}
 
-==={validation_digits} ValidatorでDigitsのチェック
+==={015} ValidatorでDigitsのチェック
 
 @<b>{タグ【015】}
 
@@ -1242,18 +1242,269 @@ public class C014ControllerTest {
 
 Digitsは数値の具体的な最小、最大値ではなく、整数部の最大桁数、小数部の最大桁数を指定します。桁数以内であれば、小さくても大丈夫です。
 
-//list[validation_digits-Book.java][Book.java]{
-@NotNull
-private String name;
-@NotNull
-@Digits(integer = 3, fraction = 2)
-private Double price;
+これまでと同様に、ControllerとJSPを作成します。
+
+//list[015-C015Controller.java][C015Controller.java]{
+package com.example.spring.controller.c015;
+
+import javax.validation.Valid;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/c015")
+public class C015Controller {
+    @RequestMapping("/bookForm")
+    public String bookForm() {
+        return "c015/bookForm";
+    }
+
+    @RequestMapping(value = "/bookRecv", method = RequestMethod.POST)
+    public String bookRecv(@Valid @ModelAttribute C015Model c015Model,
+            BindingResult errors) {
+        if (errors.hasErrors()) {
+            return "c015/bookForm";
+        }
+        return "c015/bookRecv";
+    }
+}
+//}
+
+//list[015-bookForm.jsp][bookForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="bookRecv" method="post">
+   書名: <input type="text" name="name" size="20"><form:errors path="c015Model.name" /><br>
+   価格: <input type="text" name="price" size="20"><form:errors path="c015Model.price" /><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+//list[015-bookRecv.jsp][bookRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+c015Model.nameの値は <c:out value="${c015Model.name}" /><br>
+c015Model.priceの値は <c:out value="${c015Model.price}" /><br>
+ </body>
+</html>
+//}
+
+C015ModelのpriceフィールドにValidationを設定します。整数部3桁、小数部2桁とします。また、小数部があるためDouble型にしています。
+
+//list[015-C015Model.java][C015Model.java]{
+package com.example.spring.controller.c015;
+
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
+
+public class C015Model {
+    @NotNull
+    private String name;
+    @NotNull
+    @Digits(integer = 3, fraction = 2)
+    private Double price;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+}
 //}
 
 メッセージは以下のように記述します。
 
-//list[validation_digits-messages.propeties][messages.properties]{
+//list[015-messages.propeties][messages.properties]{
 javax.validation.constraints.Digits.message = {0}は整数{integer}桁、小数{fraction}桁以内で入力してください
+//}
+
+確認用のテストケースは次のとおりです。
+
+//list[015-C015ControllerTest.java][C015ControllerTest.java]{
+package com.example.spring.controller.c015;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C015ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void bookRecvへのPOST_priceが123_45() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c015/bookRecv").param("name", "よく分かるSpring")
+                                .param("price", "123.45"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c015/bookRecv"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().errorCount(0))
+                .andExpect(model().attributeExists("c015Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c015ModelObject = model.get("c015Model");
+        assertThat(c015ModelObject, is(notNullValue()));
+        assertThat(c015ModelObject, is(instanceOf(C015Model.class)));
+        C015Model c015Model = (C015Model) c015ModelObject;
+        assertThat(c015Model.getName(), is("よく分かるSpring"));
+        assertThat(c015Model.getPrice(), is(123.45));
+    }
+
+    @Test
+    public void bookRecvへのPOST_priceが1234() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c015/bookRecv").param("name", "よく分かるSpring")
+                                .param("price", "1234"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c015/bookForm"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(
+                        model().attributeHasFieldErrors("c015Model", "price"))
+                .andExpect(model().attributeExists("c015Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c015ModelObject = model.get("c015Model");
+        assertThat(c015ModelObject, is(notNullValue()));
+        assertThat(c015ModelObject, is(instanceOf(C015Model.class)));
+        C015Model c015Model = (C015Model) c015ModelObject;
+        assertThat(c015Model.getName(), is("よく分かるSpring"));
+        assertThat(c015Model.getPrice(), is(closeTo(1234, 0.001)));
+
+        // エラーメッセージのチェック
+        Object object = mav.getModel().get(
+                "org.springframework.validation.BindingResult.c015Model");
+        assertThat(object, is(not(nullValue())));
+        assertThat(object, is(instanceOf(BindingResult.class)));
+        BindingResult bindingResult = (BindingResult) object;
+
+        checkDigitsField(bindingResult, "price", 3, 2);
+    }
+
+    @Test
+    public void bookRecvへのPOST_priceが1_234() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c015/bookRecv").param("name", "よく分かるSpring")
+                                .param("price", "1.234"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c015/bookForm"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(
+                        model().attributeHasFieldErrors("c015Model", "price"))
+                .andExpect(model().attributeExists("c015Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c015ModelObject = model.get("c015Model");
+        assertThat(c015ModelObject, is(notNullValue()));
+        assertThat(c015ModelObject, is(instanceOf(C015Model.class)));
+        C015Model c015Model = (C015Model) c015ModelObject;
+        assertThat(c015Model.getName(), is("よく分かるSpring"));
+        assertThat(c015Model.getPrice(), is(closeTo(1.234, 0.001)));
+
+        // エラーメッセージのチェック
+        Object object = mav.getModel().get(
+                "org.springframework.validation.BindingResult.c015Model");
+        assertThat(object, is(not(nullValue())));
+        assertThat(object, is(instanceOf(BindingResult.class)));
+        BindingResult bindingResult = (BindingResult) object;
+
+        checkDigitsField(bindingResult, "price", 3, 2);
+    }
+
+    private void checkDigitsField(BindingResult bindingResult,
+            String fieldName, Integer integer, Integer fraction) {
+        // エラーのあるフィールドの取得
+        List<FieldError> list = bindingResult.getFieldErrors(fieldName);
+        assertThat(list, is(not(nullValue())));
+        assertThat(list.size(), is(1));
+
+        // 詳細なエラーチェック
+        FieldError fieldError = list.get(0);
+        assertThat(fieldError.getCode(), is("Digits"));
+
+        // エラーメッセージのパラメータ
+        Object[] args = fieldError.getArguments();
+        assertThat(args.length, is(3));
+        assertThat(args[0],
+                is(instanceOf(DefaultMessageSourceResolvable.class)));
+        DefaultMessageSourceResolvable dmr = (DefaultMessageSourceResolvable) args[0];
+        assertThat(dmr.getCode(), is(fieldName));
+        // value
+        assertThat(args[1], is(instanceOf(Integer.class)));
+        assertThat(args[1], is(fraction));
+        assertThat(args[2], is(instanceOf(Integer.class)));
+        assertThat(args[2], is(integer));
+    }
+}
 //}
 
 ==={validation_size} ValidatorでSizeのチェック
