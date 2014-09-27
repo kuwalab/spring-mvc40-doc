@@ -1346,6 +1346,16 @@ public class C015Model {
 javax.validation.constraints.Digits.message = {0}は整数{integer}桁、小数{fraction}桁以内で入力してください
 //}
 
+テストにはcloseToメソッドを使用するため、pom.xmlに次の依存関係を追加します。
+
+//list[015-pom.xml][pom.xml]{
+<dependency>
+ <groupId>org.hamcrest</groupId>
+ <artifactId>hamcrest-library</artifactId>
+ <version>1.3</version>
+</dependency>
+//}
+
 確認用のテストケースは次のとおりです。
 
 //list[015-C015ControllerTest.java][C015ControllerTest.java]{
