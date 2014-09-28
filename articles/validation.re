@@ -1775,7 +1775,7 @@ public class C016ControllerTest {
 }
 //}
 
-==={validation_regexp} Validatorで正規表現でのチェック
+==={017} Validatorで正規表現でのチェック
 
 @<b>{タグ【017】}
 
@@ -1783,15 +1783,176 @@ public class C016ControllerTest {
 
 正規表現なので、色々なパターンのチェックができますが、今回は「ISBN + 数字10桁」のチェックをします。
 
-//list[validation_regexp-Book.java][Book.java]{
-@NotNull
-@Pattern(regexp = "ISBN[0-9]{10}", message = "{0}はISBNを入力してください")
-private String name;
-@NotNull
-private Integer price;
+最初にこれまでと同様の、ControllerとJSPを作成します。ControllerとJSPの先の例と同様のため、説明は省略します。
+
+//list[017-C017Controller.java][C017Controller.java]{
+package com.example.spring.controller.c017;
+
+import javax.validation.Valid;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/c017")
+public class C017Controller {
+    @RequestMapping("/bookForm")
+    public String bookForm() {
+        return "c017/bookForm";
+    }
+
+    @RequestMapping(value = "/bookRecv", method = RequestMethod.POST)
+    public String bookRecv(@Valid @ModelAttribute C017Model c017Model,
+            BindingResult errors) {
+        if (errors.hasErrors()) {
+            return "c017/bookForm";
+        }
+        return "c017/bookRecv";
+    }
+}
+//}
+
+//list[017-bookForm.jsp][bookForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="bookRecv" method="post">
+   書名: <input type="text" name="name" size="20"><form:errors path="c017Model.name" /><br>
+   価格: <input type="text" name="price" size="20"><form:errors path="c017Model.price" /><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+//list[017-bookRecv.jsp][bookRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+c017Model.nameの値は <c:out value="${c017Model.name}" /><br>
+c017Model.priceの値は <c:out value="${c017Model.price}" /><br>
+ </body>
+</html>
+//}
+
+C017ModelのnameフィールドにValidationを設定します。
+
+//list[017-C017Model.java][C017Model.java]{
+package com.example.spring.controller.c017;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+public class C017Model {
+    @NotNull
+    @Pattern(regexp = "ISBN[0-9]{10}", message = "{0}はISBNを入力してください")
+    private String name;
+    private Integer price;
+}
 //}
 
 メッセージのデフォルトは、regexp属性の値を表示しますが、ユーザーにはやさしくないため、@Patternのmessage属性で直接指定しています。
+
+確認用のテストケースは次のとおりです。
+
+//list[017-C017ControllerTest.java][C017ControllerTest.java]{
+package com.example.spring.controller.c017;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C017ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void bookRecvへのPOST_nameがISBN1234567890() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c017/bookRecv").param("name", "ISBN1234567890")
+                                .param("price", "123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c017/bookRecv"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().errorCount(0))
+                .andExpect(model().attributeExists("c017Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c017ModelObject = model.get("c017Model");
+        assertThat(c017ModelObject, is(notNullValue()));
+        assertThat(c017ModelObject, is(instanceOf(C017Model.class)));
+        C017Model c017Model = (C017Model) c017ModelObject;
+        assertThat(c017Model.getName(), is("ISBN1234567890"));
+        assertThat(c017Model.getPrice(), is(123));
+    }
+
+    @Test
+    public void bookRecvへのPOST_nameがISBN123456789() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c017/bookRecv").param("name", "ISBN123456789")
+                                .param("price", "123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c017/bookForm"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(model().attributeHasFieldErrors("c017Model", "name"))
+                .andExpect(model().attributeExists("c017Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c017ModelObject = model.get("c017Model");
+        assertThat(c017ModelObject, is(notNullValue()));
+        assertThat(c017ModelObject, is(instanceOf(C017Model.class)));
+        C017Model c017Model = (C017Model) c017ModelObject;
+        assertThat(c017Model.getName(), is("ISBN123456789"));
+        assertThat(c017Model.getPrice(), is(123));
+    }
+}
+//}
 
 ==={validation_not_blank} ValidatorでNotBlankのチェック
 
