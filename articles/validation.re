@@ -1517,7 +1517,7 @@ public class C015ControllerTest {
 }
 //}
 
-==={validation_size} ValidatorでSizeのチェック
+==={016} ValidatorでSizeのチェック
 
 @<b>{タグ【016】}
 
@@ -1525,21 +1525,255 @@ public class C015ControllerTest {
 
 Sizeは文字列の長さの検査や、Collectionの長さの検査ができます。今回は文字列の長さの例を見ていきます。
 
-//list[validation_size-Book.java][Book.java]{
-@NotNull
-@Size(min = 10, max = 10)
-private String name;
-@NotNull
-private Integer price;
+最初にこれまでと同様の、ControllerとJSPを作成します。ControllerとJSPは先の例と同様のため、説明は省略します。
+
+//list[016-C016Controller.java][C016Controller.java]{
+package com.example.spring.controller.c016;
+
+import javax.validation.Valid;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/c016")
+public class C016Controller {
+    @RequestMapping("/bookForm")
+    public String bookForm() {
+        return "c016/bookForm";
+    }
+
+    @RequestMapping(value = "/bookRecv", method = RequestMethod.POST)
+    public String bookRecv(@Valid @ModelAttribute C016Model c016Model,
+            BindingResult errors) {
+        if (errors.hasErrors()) {
+            return "c016/bookForm";
+        }
+        return "c016/bookRecv";
+    }
+}
+//}
+
+//list[016-bookForm.jsp][bookForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="bookRecv" method="post">
+   書名: <input type="text" name="name" size="20"><form:errors path="c016Model.name" /><br>
+   価格: <input type="text" name="price" size="20"><form:errors path="c016Model.price" /><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+//list[016-bookRecv.jsp][bookRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+c016Model.nameの値は <c:out value="${c016Model.name}" /><br>
+c016Model.priceの値は <c:out value="${c016Model.price}" /><br>
+ </body>
+</html>
+//}
+
+C016ModelのnameフィールドにValidationを設定します。以下の例だと10文字の入力だけが許可されます。
+
+//list[016-C016Model.java][C016Model.java]{
+package com.example.spring.controller.c016;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+public class C016Model {
+    @NotNull
+    @Size(min = 10, max = 10)
+    private String name;
+    @Max(100000)
+    private Integer price;
+}
 //}
 
 メッセージは以下のように記述します。
 
-//list[validation_size-messages.properties][messages.properties]{
+//list[016-messages.properties][messages.properties]{
 javax.validation.constraints.Size.message = ${min == max ? min += '文字で入力してください' : min += '〜' += max += '文字で入力してください'}
 //}
 
 メッセージはELで分岐し、最大最小文字が同じ場合と、それ以外で変更しています
+
+確認用のテストケースは次のとおりです。
+
+//list[016-C016ContollerTest.java][C016ControllerTest.java]{
+package com.example.spring.controller.c016;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C016ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void bookRecvへのPOST_nameが10文字() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c016/bookRecv").param("name", "1234567890")
+                                .param("price", "123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c016/bookRecv"))
+                .andExpect(model().hasNoErrors())
+                .andExpect(model().errorCount(0))
+                .andExpect(model().attributeExists("c016Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c016ModelObject = model.get("c016Model");
+        assertThat(c016ModelObject, is(notNullValue()));
+        assertThat(c016ModelObject, is(instanceOf(C016Model.class)));
+        C016Model c016Model = (C016Model) c016ModelObject;
+        assertThat(c016Model.getName(), is("1234567890"));
+        assertThat(c016Model.getPrice(), is(123));
+    }
+
+    @Test
+    public void bookRecvへのPOST_nameが9文字() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c016/bookRecv").param("name", "123456789")
+                                .param("price", "123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c016/bookForm"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(model().attributeHasFieldErrors("c016Model", "name"))
+                .andExpect(model().attributeExists("c016Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c016ModelObject = model.get("c016Model");
+        assertThat(c016ModelObject, is(notNullValue()));
+        assertThat(c016ModelObject, is(instanceOf(C016Model.class)));
+        C016Model c016Model = (C016Model) c016ModelObject;
+        assertThat(c016Model.getName(), is("123456789"));
+        assertThat(c016Model.getPrice(), is(123));
+
+        // エラーメッセージのチェック
+        Object object = mav.getModel().get(
+                "org.springframework.validation.BindingResult.c016Model");
+        assertThat(object, is(not(nullValue())));
+        assertThat(object, is(instanceOf(BindingResult.class)));
+        BindingResult bindingResult = (BindingResult) object;
+
+        checkSizeField(bindingResult, "name", 10, 10);
+    }
+
+    @Test
+    public void bookRecvへのPOST_nameが11文字() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(
+                        post("/c016/bookRecv").param("name", "12345678901")
+                                .param("price", "123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c016/bookForm"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(model().attributeHasFieldErrors("c016Model", "name"))
+                .andExpect(model().attributeExists("c016Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c016ModelObject = model.get("c016Model");
+        assertThat(c016ModelObject, is(notNullValue()));
+        assertThat(c016ModelObject, is(instanceOf(C016Model.class)));
+        C016Model c016Model = (C016Model) c016ModelObject;
+        assertThat(c016Model.getName(), is("12345678901"));
+        assertThat(c016Model.getPrice(), is(123));
+
+        // エラーメッセージのチェック
+        Object object = mav.getModel().get(
+                "org.springframework.validation.BindingResult.c016Model");
+        assertThat(object, is(not(nullValue())));
+        assertThat(object, is(instanceOf(BindingResult.class)));
+        BindingResult bindingResult = (BindingResult) object;
+
+        checkSizeField(bindingResult, "name", 10, 10);
+    }
+
+    private void checkSizeField(BindingResult bindingResult, String fieldName,
+            Integer min, Integer max) {
+        // エラーのあるフィールドの取得
+        List<FieldError> list = bindingResult.getFieldErrors(fieldName);
+        assertThat(list, is(not(nullValue())));
+        assertThat(list.size(), is(1));
+
+        // 詳細なエラーチェック
+        FieldError fieldError = list.get(0);
+        assertThat(fieldError.getCode(), is("Size"));
+
+        // エラーメッセージのパラメータ
+        Object[] args = fieldError.getArguments();
+        assertThat(args.length, is(3));
+        assertThat(args[0],
+                is(instanceOf(DefaultMessageSourceResolvable.class)));
+        DefaultMessageSourceResolvable dmr = (DefaultMessageSourceResolvable) args[0];
+        assertThat(dmr.getCode(), is(fieldName));
+        // value
+        assertThat(args[1], is(instanceOf(Integer.class)));
+        assertThat(args[1], is(max));
+        assertThat(args[2], is(instanceOf(Integer.class)));
+        assertThat(args[2], is(min));
+    }
+}
+//}
 
 ==={validation_regexp} Validatorで正規表現でのチェック
 
