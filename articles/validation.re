@@ -1954,7 +1954,7 @@ public class C017ControllerTest {
 }
 //}
 
-==={validation_not_blank} ValidatorでNotBlankのチェック
+==={018} ValidatorでNotBlankのチェック
 
 @<b>{タグ【018】}
 
@@ -1962,17 +1962,204 @@ public class C017ControllerTest {
 
 Bean Validationの標準ではなく、Hibernateの実装に含んでいるValidatorになります。これを使うと文字列の空文字のチェックができます。
 
-//list[validation_not_blank-Book.java][Book.java]{
-@NotBlank
-private String name;
-@NotNull
-private Integer price;
+最初にこれまでと同様の、ControllerとJSPを作成します。ControllerとJSPは先の例と同様のため、説明は省略します。
+
+//list[018-C018Controller.java][C018Controller.java]{
+package com.example.spring.controller.c018;
+
+import javax.validation.Valid;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+@Controller
+@RequestMapping("/c018")
+public class C018Controller {
+    @RequestMapping("/bookForm")
+    public String bookForm() {
+        return "c018/bookForm";
+    }
+
+    @RequestMapping(value = "/bookRecv", method = RequestMethod.POST)
+    public String bookRecv(@Valid @ModelAttribute C018Model c018Model,
+            BindingResult errors) {
+        if (errors.hasErrors()) {
+            return "c018/bookForm";
+        }
+        return "c018/bookRecv";
+    }
+}
+//}
+
+//list[018-bookForm.jsp][bookForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="bookRecv" method="post">
+   書名: <input type="text" name="name" size="20"><form:errors path="c018Model.name" /><br>
+   価格: <input type="text" name="price" size="20"><form:errors path="c018Model.price" /><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
+
+//list[018-bookRecv.jsp][bookRecv.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+c018Model.nameの値は <c:out value="${c018Model.name}" /><br>
+c018Model.priceの値は <c:out value="${c018Model.price}" /><br>
+ </body>
+</html>
+//}
+
+C018ModelのnameフィールドにValidationを設定します。
+
+//list[018-C018Model.java][C018Model.java]{
+package com.example.spring.controller.c018;
+
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
+
+public class C018Model {
+    @NotBlank
+    private String name;
+    @NotNull
+    private Integer price;
+}
 //}
 
 メッセージは以下のようにします。
 
-//list[validation_not_blank-messages.properties][messages.properteis]{
+//list[018-messages.properties][messages.properteis]{
 org.hibernate.validator.constraints.NotBlank.message = 入力は必須です
+//}
+
+確認用のテストケースは次のとおりです。
+
+//list[018-C018ControllerTest.java][C018ControllerTest.java]{
+package com.example.spring.controller.c018;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.ModelAndView;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C018ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void bookFormへのGET() throws Exception {
+        mockMvc.perform(get("/c018/bookForm")).andExpect(status().isOk())
+                .andExpect(view().name("c018/bookForm"))
+                .andExpect(model().hasNoErrors());
+    }
+
+    @Test
+    public void bookRecvへのPOST_nameがblankでない() throws Exception {
+        mockMvc.perform(
+                post("/c018/bookRecv").param("name", "よくわかるSpring").param(
+                        "price", "1000")).andExpect(status().isOk())
+                .andExpect(view().name("c018/bookRecv"))
+                .andExpect(model().hasNoErrors());
+    }
+
+    @Test
+    public void bookRecvへのPOST_nameがblank() throws Exception {
+        MvcResult mvcResult = mockMvc
+                .perform(post("/c018/bookRecv").param("price", "1000"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c018/bookForm"))
+                .andExpect(model().hasErrors())
+                .andExpect(model().errorCount(1))
+                .andExpect(model().attributeHasFieldErrors("c018Model", "name"))
+                .andExpect(model().attributeExists("c018Model")).andReturn();
+
+        // パラメータのチェック
+        ModelAndView mav = mvcResult.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+        Object c018ModelObject = model.get("c018Model");
+        assertThat(c018ModelObject, is(notNullValue()));
+        assertThat(c018ModelObject, is(instanceOf(C018Model.class)));
+        C018Model c018Model = (C018Model) c018ModelObject;
+        assertThat(c018Model.getName(), is(nullValue()));
+
+        // エラーメッセージのチェック
+        Object object = mav.getModel().get(
+                "org.springframework.validation.BindingResult.c018Model");
+        assertThat(object, is(not(nullValue())));
+        assertThat(object, is(instanceOf(BindingResult.class)));
+        BindingResult bindingResult = (BindingResult) object;
+
+        checkField(bindingResult, "name", "NotBlank");
+    }
+
+    private void checkField(BindingResult bindingResult, String fieldName,
+            String errorCode) {
+        // エラーのあるフィールドの取得
+        List<FieldError> list = bindingResult.getFieldErrors(fieldName);
+        assertThat(list, is(not(nullValue())));
+        assertThat(list.size(), is(1));
+
+        // 詳細なエラーチェック
+        FieldError fieldError = list.get(0);
+        assertThat(fieldError.getCode(), is(errorCode));
+
+        // エラーメッセージのパラメータ
+        Object[] args = fieldError.getArguments();
+        assertThat(args.length, is(1));
+        assertThat(args[0],
+                is(instanceOf(DefaultMessageSourceResolvable.class)));
+        DefaultMessageSourceResolvable dmr = (DefaultMessageSourceResolvable) args[0];
+        assertThat(dmr.getCode(), is(fieldName));
+    }
+
+}
 //}
 
 ==={validation_logic} Validatorでロジックを介した検証
