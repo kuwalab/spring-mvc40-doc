@@ -2390,7 +2390,31 @@ public class C019ControllerTest {
 }
 //}
 
-=== Validatorのエラーの際に入力値を再表示させる
+==={020} Validatorのエラーの際に入力値を再表示させる
+
+
+前回のソースの内、フォームのJSPのみを変更して、フォームの値の再表示が可能です。
+
+<form:input>タグを使ってpathにエラーメッセージと同じようにモデル名.フィールド名を指定することで、リクエストから自動的に値が割り当てられます。
+
+//list[020-bookForm.jsp][bookForm.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <form action="bookRecv" method="post">
+   書名: <form:input path="c020Model.name" size="20" /><form:errors path="c020Model.name" /><br>
+   価格: <form:input path="c020Model.price" size="20" /><form:errors path="c020Model.price" /><form:errors path="c020Model.validPrice" /><br>
+   定価: <form:input path="c020Model.listPrice" size="20" /><form:errors path="c020Model.listPrice" /><br>
+   <input type="submit" value="送信">
+  </form>
+ </body>
+</html>
+//}
 
 == ロジックによる入力チェック
 
