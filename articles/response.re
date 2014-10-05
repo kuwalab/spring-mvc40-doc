@@ -232,7 +232,7 @@ public class C023ControllerTest {
 }
 //}
 
-==={csv_download3} CSVファイルのダウンロード（ResponseBody）
+==={024} CSVファイルのダウンロード（ResponseBody）
 
 @<b>{タグ【024】}
 
@@ -244,24 +244,42 @@ ResponseEntityではデータと、ヘッダー、ステータスコードを返
 
 CSVデータはただの文字列のデータになります。
 
-//list[csv_download3-ResController.java][ResController.java]{
-@RequestMapping(value = "/csvDown3", method = RequestMethod.GET,
-    produces = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
-        + ";charset=utf-8")
-@ResponseBody
-public String csvDown3(HttpServletResponse response) {
-    response.setHeader("Content-Disposition",
-            "attachment; filename=\"test3.csv\"");
+//list[024-C024Controller.java][C024Controller.java]{
+package com.example.spring.controller.c024;
 
-    String csvData = "山田　太郎,33\r\n";
-    csvData = csvData + "田中　花子,29";
-    return csvData;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+public class C024Controller {
+    @RequestMapping("/c024/csvInit")
+    public String csvInit() {
+        return "c024/csvInit";
+    }
+
+    @RequestMapping(value = "/c024/csvDown", method = RequestMethod.GET,
+        produces = MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE
+            + ";charset=utf-8")
+    @ResponseBody
+    public String csvDown3(HttpServletResponse response) {
+        response.setHeader("Content-Disposition",
+                "attachment; filename=\"test3.csv\"");
+
+        String csvData = "山田　太郎,33\r\n";
+        csvData = csvData + "田中　花子,29\r\n";
+        return csvData;
+    }
 }
 //}
 
-アンカーを表示する画面です。単純なアンカーのみです。前回のものに3を追加しています。
+アンカーを表示する画面です。単純なアンカーのみです。
 
-//list[csv_download3-csvInit3.jsp][csvInit3.jsp]{
+//list[024-csvInit3.jsp][csvInit3.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -270,11 +288,64 @@ public String csvDown3(HttpServletResponse response) {
   <title>サンプル</title>
  </head>
  <body>
-  <a href="csvDown">csvDown</a><br>
-  <a href="csvDown2">csvDown2</a><br>
-  <a href="csvDown3">csvDown3</a>
+  <a href="csvDown">csvDown</a>
  </body>
 </html>
+//}
+
+確認用のテストケースは次のとおりです。
+
+//list[024-C024ControllerTest.java][C024ControllerTest.java]{
+package com.example.spring.controller.c024;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C024ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void csvInitのGET() throws Exception {
+        mockMvc.perform(get("/c024/csvInit")).andExpect(status().isOk())
+                .andExpect(view().name("c024/csvInit"));
+    }
+
+    @Test
+    public void csvDownのGET() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append("山田　太郎,33\r\n");
+        sb.append("田中　花子,29\r\n");
+        mockMvc.perform(get("/c024/csvDown"))
+                .andExpect(status().isOk())
+                .andExpect(
+                        content().contentType(
+                                "application/octet-stream;charset=utf-8"))
+                .andExpect(content().string(sb.toString()));
+    }
+}
 //}
 
 ==={csv_download4} CSVファイルのダウンロード（Resolver）
