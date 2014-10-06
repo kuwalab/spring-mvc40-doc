@@ -348,22 +348,22 @@ public class C024ControllerTest {
 }
 //}
 
-==={csv_download4} CSVファイルのダウンロード（Resolver）
+==={032} CSVファイルのダウンロード（Resolver）
 
 @<b>{タグ【032】}
 
-spring-context.xmlにViewResolverの設定を追加します。
+spring-context.xmlにViewResolverの設定を追加します。処理する順番（order）を1にして最初に参照するようにします。
 
-//list[csv_download4-spring-context.xml][spring-context.xml]{
+//list[032-spring-context.xml][spring-context.xml]{
 <bean id="xmlViewResolver" class="org.springframework.web.servlet.view.XmlViewResolver">
  <property name="order" value="1" />
  <property name="location" value="/WEB-INF/spring/views.xml" />
 </bean>
 //}
 
-views.xmlは以下になります。
+viewResolverで参照する設定ファイルのviews.xmlは次のようになります。
 
-//list[csv_download4-views.xml][views.xml]{
+//list[032-views.xml][views.xml]{
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -375,14 +375,14 @@ http://www.springframework.org/schema/context
 http://www.springframework.org/schema/context/spring-context-4.0.xsd
 http://www.springframework.org/schema/mvc
 http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
- <bean id="csvDownload" class="com.example.spring.controller.CsvDownloadView" />
+ <bean id="c032Download" class="com.example.spring.controller.c032.C032DownloadView" />
 </beans>
 //}
 
-Resolver
+この例だと、viewの名前がc032Downloadの場合にC032DownloadView#renderMergedOutputModelが呼び出されます。そのC032DownloadViewクラスは次のとおりです。
 
-//list[csv_download4-CsvDownloadView.java][CsvDownloadView.java]{
-package com.example.spring.controller;
+//list[032-c032DownloadView.java][C032DownloadView.java]{
+package com.example.spring.controller.c032;
 
 import java.io.PrintWriter;
 import java.util.List;
@@ -394,8 +394,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.servlet.view.AbstractView;
 
-public class CsvDownloadView extends AbstractView {
+public class C032DownloadView extends AbstractView {
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void renderMergedOutputModel(Map<String, Object> model,
             HttpServletRequest request, HttpServletResponse response)
@@ -407,35 +408,151 @@ public class CsvDownloadView extends AbstractView {
         response.setHeader("Content-Disposition",
                 "attachment; filename=\"test.csv\"");
         try (PrintWriter pw = response.getWriter()) {
-            for (Book book : (List<Book>) model.get("bookList")) {
-                pw.print(book.getName());
+            for (C032Model c032Model : (List<C032Model>) model
+                    .get("c032ModelList")) {
+                pw.print(c032Model.getName());
                 pw.print(",");
-                pw.println(book.getPrice());
+                pw.print(c032Model.getPrice());
+                pw.print("\r\n");
             }
         }
     }
 }
 //}
 
-Controllerです。
+AbstractViewを継承し、renderMergedOutputModelメソッドを実装します。
 
-//list[csv_download4-ResController.java][ResController.java]{
-@RequestMapping("/csvDown4")
-public String csvDown4(Model model) {
-    List<Book> bookList = new ArrayList<>();
+ContollerとJSPはこれまでと大きく変わりません。
 
-    Book book = new Book();
-    book.setName("よくわかるSpring");
-    book.setPrice(3000);
-    bookList.add(book);
+//list[032-C032Controller.java][C032Controller.java]{
+package com.example.spring.controller.c032;
 
-    book = new Book();
-    book.setName("よくわかるJava");
-    book.setPrice(2980);
-    bookList.add(book);
+import java.util.ArrayList;
+import java.util.List;
 
-    model.addAttribute("bookList", bookList);
-    return "csvDownload";
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+public class C032Controller {
+    @RequestMapping("/c032/csvInit")
+    public String csvInit() {
+        return "c032/csvInit";
+    }
+
+    @RequestMapping("/c032/csvDown")
+    public String csvDown4(Model model) {
+        List<C032Model> c032ModelList = new ArrayList<>();
+
+        C032Model c032Model = new C032Model();
+        c032Model.setName("よくわかるSpring");
+        c032Model.setPrice(3000);
+        c032ModelList.add(c032Model);
+
+        c032Model = new C032Model();
+        c032Model.setName("よくわかるJava");
+        c032Model.setPrice(2980);
+        c032ModelList.add(c032Model);
+
+        model.addAttribute("c032ModelList", c032ModelList);
+        return "c032Download";
+    }
+}
+//}
+
+//list[032-C032Model.java][C032Model.java]{
+package com.example.spring.controller.c032;
+
+public class C032Model {
+    private String name;
+    private Integer price;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+}
+//}
+
+//list[032-csvInit.jsp][csvInit.jsp]{
+<%@page contentType="text/html; charset=utf-8" %><%--
+--%><!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>サンプル</title>
+ </head>
+ <body>
+  <a href="csvDown">csvDown</a>
+ </body>
+</html>
+//}
+
+確認用のテストケースは次のとおりです。
+
+//list[032-C032ControllerTest.java][C032ControllerTest.java]{
+package com.example.spring.controller.c032;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = {
+     "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C032ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void csvInitのGET() throws Exception {
+        mockMvc.perform(get("/c032/csvInit")).andExpect(status().isOk())
+                .andExpect(view().name("c032/csvInit"));
+    }
+
+    @Test
+    public void csvDownのGET() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        sb.append("よくわかるSpring,3000\r\n");
+        sb.append("よくわかるJava,2980\r\n");
+        mockMvc.perform(get("/c032/csvDown"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c032Download"))
+                .andExpect(
+                        content().contentType(
+                                "application/octet-stream;charset=utf-8"))
+                .andExpect(content().string(sb.toString()));
+    }
 }
 //}
 
