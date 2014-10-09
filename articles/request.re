@@ -1253,20 +1253,32 @@ public class GlobalExceptionResolver implements HandlerExceptionResolver {
 
 == いろいろなスコープ
 
-==={scope_request1} リクエストスコープにデータを格納
+==={027} リクエストスコープにデータを格納
 
 @<b>{タグ【027】}
 
 リクエストスコープにデータを格納する方法を紹介します。Springではいくつかの方法でリクエストスコープにデータを格納できます。ひとつは通常のサーブレットと同様にHttpServletRequestを使う方法。2つ目がWebRequestを使う方法。3つ目がModelを使う方法になります。
 
-//list[scope_request1-ScopeController.java][ScopeController.java]{
-@RequestMapping("/requestScope1")
-public String requestScope1(HttpServletRequest request,
-        WebRequest webRequest, Model model) {
-    request.setAttribute("req1", "httpServletRequest");
-    webRequest.setAttribute("req2", "webRequest", WebRequest.SCOPE_REQUEST);
-    model.addAttribute("req3", "model");
-    return "scope/requestScope1";
+//list[027-C027Controller.java][C027Controller.java]{
+package com.example.spring.controller.c027;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.WebRequest;
+
+@Controller
+public class C027Controller {
+    @RequestMapping("/c027/requestScope")
+    public String requestScope(HttpServletRequest request,
+            WebRequest webRequest, Model model) {
+        request.setAttribute("req1", "httpServletRequest");
+        webRequest.setAttribute("req2", "webRequest", WebRequest.SCOPE_REQUEST);
+        model.addAttribute("req3", "model");
+        return "c027/requestScope";
+    }
 }
 //}
 
@@ -1276,7 +1288,7 @@ Modelオブジェクトを利用する場合は、メソッド名が違うだけ
 
 使用するJSPでは、明示してrequestScopeから値を取得しています。
 
-//list[scope_reuqest1-requestScope1.jsp][requestScope1.jsp]{
+//list[027-requestScope.jsp][requestScope.jsp]{
 <%@page contentType="text/html; charset=utf-8" %><%--
 --%><!DOCTYPE html>
 <html>
@@ -1292,24 +1304,51 @@ Model: <c:out value="${requestScope.req3}" />
 </html>
 //}
 
-テストは以下のとおりです。
+確認用のテストケースは次のとおりです。
 
-//list[scope_reuqest1-ScopeControllerTest.java][ScopeControllerTest.java]{
-@Test
-public void requestScope1のGET() throws Exception {
-    MvcResult mvcResult = mockMvc
-            .perform(get("/requestScope1"))
-            .andExpect(status().isOk())
-            .andExpect(view().name("scope/requestScope1"))
-            .andExpect(model().hasNoErrors())
-            .andExpect(
-                    request().attribute("req1", is("httpServletRequest")))
-            .andExpect(request().attribute("req2", is("webRequest")))
-            .andExpect(request().attribute("req3", is("model")))
-            .andExpect(model().attributeExists("req3")).andReturn();
+//list[027-C027ControllerTest.java][C027ControllerTest.java]{
+package com.example.spring.controller.c027;
 
-    Map<String, Object> model = mvcResult.getModelAndView().getModel();
-    assertThat(model.get("req3"), is("model"));
+import static org.hamcrest.CoreMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.*;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/spring-context.xml" })
+public class C027ControllerTest {
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void setup() {
+        mockMvc = webAppContextSetup(wac).build();
+    }
+
+    @Test
+    public void requestScopeのGET() throws Exception {
+        mockMvc.perform(get("/c027/requestScope"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("c027/requestScope"))
+                .andExpect(
+                        request().attribute("req1", is("httpServletRequest")))
+                .andExpect(request().attribute("req2", is("webRequest")))
+                .andExpect(model().attribute("req3", is("model")));
+    }
 }
 //}
 
